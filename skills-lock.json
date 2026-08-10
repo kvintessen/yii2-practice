@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "multi-stage-dockerfile": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/multi-stage-dockerfile/SKILL.md",
+      "computedHash": "698bf93a84dae18fd7bd0b1d35c21427307fde78fbdf4624be9726f5f98189ca"
+    },
+    "php-best-practices": {
+      "source": "asyrafhussin/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/php-best-practices/SKILL.md",
+      "computedHash": "1b25a60572ddd8b206eaf68b067cde70a9d002df572de8fefda703532cecfdad"
+    },
+    "yii2-expert": {
+      "source": "app-dev-panel/app-dev-panel",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/yii2-expert/SKILL.md",
+      "computedHash": "d2763f9ec6e276956904a6e3a9a7dea87556ea627423fdfeaa96a9ac4c237e29"
+    }
+  }
+}

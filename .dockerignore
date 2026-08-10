@@ -1,0 +1,9 @@
+.git
+.gitignore
+.env
+vendor
+runtime
+web/assets
+**/*.md
+.agents
+skills-lock.json
