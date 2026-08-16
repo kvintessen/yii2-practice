@@ -14,6 +14,8 @@ class AdminModule extends Module
 
     public $defaultRoute = 'category';
 
+    public $layout = 'main';
+
     /**
      * {@inheritdoc}
      */

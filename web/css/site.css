@@ -107,6 +107,44 @@ main > .container {
     font-style: italic;
 }
 
+/* ---- admin sidebar ---- */
+
+@media (min-width: 768px) {
+    .admin-sidebar {
+        position: sticky;
+        top: 5rem;
+    }
+}
+
+.admin-sidebar-list {
+    display: flex;
+    flex-direction: column;
+    gap: .15rem;
+}
+
+.admin-sidebar-link {
+    display: block;
+    padding: .3rem .1rem;
+    font-size: .875rem;
+    color: var(--bs-secondary-color);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: color .15s ease, border-color .15s ease;
+}
+
+.admin-sidebar-link:hover,
+.admin-sidebar-link:focus {
+    color: var(--bs-body-color);
+    text-decoration: underline;
+}
+
+.admin-sidebar-link.active {
+    color: var(--brand-primary);
+    font-weight: 600;
+    border-left-color: var(--brand-accent);
+    padding-left: .5rem;
+}
+
 /* add sorting icons to gridview sort links */
 a.asc:after, a.desc:after {
     content: '';

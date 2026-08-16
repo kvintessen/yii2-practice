@@ -15,8 +15,6 @@ $this->title = 'Products';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="product-index">
-    <?= $this->render('/_nav') ?>
-
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p><?= Html::a('New Product', ['create'], ['class' => 'btn btn-primary']) ?></p>

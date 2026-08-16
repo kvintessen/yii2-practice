@@ -21,8 +21,6 @@ $statuses = [
 ];
 ?>
 <div class="order-view">
-    <?= $this->render('/_nav') ?>
-
     <h1><?= Html::encode($this->title) ?></h1>
 
     <?= DetailView::widget([
