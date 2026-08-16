@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use Yii;
 use yii\base\Model;
-use yii\base\Security;
 
 /**
  * SignupForm is the model behind the registration form.
@@ -17,11 +15,6 @@ class SignupForm extends Model
     public string $email = '';
     public string $password = '';
     public string $passwordRepeat = '';
-
-    public function __construct(private readonly Security $security, $config = [])
-    {
-        parent::__construct($config);
-    }
 
     /**
      * @return array the validation rules.
@@ -42,25 +35,5 @@ class SignupForm extends Model
             ['password', 'string', 'min' => 8],
             ['passwordRepeat', 'compare', 'compareAttribute' => 'password', 'message' => 'Passwords do not match.'],
         ];
-    }
-
-    /**
-     * Signs the user up.
-     *
-     * @return User|null the saved user, or null if signup failed
-     */
-    public function signup(): User|null
-    {
-        if (!$this->validate()) {
-            return null;
-        }
-
-        $user = new User();
-        $user->username = $this->username;
-        $user->email = $this->email;
-        $user->password_hash = $this->security->generatePasswordHash($this->password);
-        $user->generateAuthKey();
-
-        return $user->save() ? $user : null;
     }
 }

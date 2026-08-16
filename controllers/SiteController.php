@@ -7,9 +7,10 @@ namespace app\controllers;
 use Yii;
 use app\models\LoginForm;
 use app\models\SignupForm;
+use app\services\LoginService;
+use app\services\SignupService;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\base\Security;
 use yii\web\Controller;
 use yii\web\ErrorAction;
 use yii\web\Response;
@@ -19,7 +20,8 @@ class SiteController extends Controller
     public function __construct(
         $id,
         $module,
-        private readonly Security $security,
+        private readonly LoginService $loginService,
+        private readonly SignupService $signupService,
         $config = [],
     ) {
         parent::__construct($id, $module, $config);
@@ -84,9 +86,9 @@ class SiteController extends Controller
             return $this->goHome();
         }
 
-        $model = new LoginForm($this->security);
+        $model = new LoginForm();
 
-        if ($model->load($this->request->post()) && $model->login()) {
+        if ($model->load($this->request->post()) && $this->loginService->login($model)) {
             return $this->goBack();
         }
 
@@ -118,10 +120,10 @@ class SiteController extends Controller
             return $this->goHome();
         }
 
-        $model = new SignupForm($this->security);
+        $model = new SignupForm();
 
         if ($model->load($this->request->post())) {
-            $user = $model->signup();
+            $user = $this->signupService->signup($model);
 
             if ($user !== null && Yii::$app->user->login($user)) {
                 return $this->goHome();

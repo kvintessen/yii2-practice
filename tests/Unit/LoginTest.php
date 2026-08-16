@@ -6,6 +6,8 @@ namespace app\tests\Unit;
 
 use app\controllers\SiteController;
 use app\models\User;
+use app\services\LoginService;
+use app\services\SignupService;
 use Yii;
 use yii\base\Security;
 use yii\web\View;
@@ -17,7 +19,8 @@ final class LoginTest extends \Codeception\Test\Unit
         $controller = new SiteController(
             'site',
             Yii::$app,
-            new Security(),
+            new LoginService(new Security()),
+            new SignupService(new Security()),
         );
 
         $view = new View(['context' => $controller]);
