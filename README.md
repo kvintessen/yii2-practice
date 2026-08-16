@@ -27,10 +27,6 @@ features to your application.
     <img src="docs/images/home-light.png" alt="Web Application Basic">
 </picture>
 
-## Docker
-
-[![Apache](https://img.shields.io/github/actions/workflow/status/yiisoft/yii2-app-basic/docker.yml?style=for-the-badge&logo=apache&label=Apache)](https://github.com/yiisoft/yii2-app-basic/actions/workflows/docker.yml)
-
 DIRECTORY STRUCTURE
 -------------------
 
@@ -97,30 +93,39 @@ http://localhost/basic/web/
 
 ## Install with Docker
 
-Update your vendor packages
+The dev stack is `nginx` + `php-fpm` + `postgres`, configured via `docker-compose.yml` and `.env`.
 
-    docker-compose run --rm php composer update --prefer-dist
-    
-Run the installation triggers (creating cookie validation code)
+Build the images
 
-    docker-compose run --rm php composer install    
-    
-Start the container
+    docker compose build
 
-    docker-compose up -d
-    
+Install vendor packages (creates `vendor/` and generates the cookie validation key)
+
+    docker compose run --rm php composer install
+
+Start the stack
+
+    docker compose up -d
+
+Create the database schema (migrations)
+
+    docker compose exec php php yii migrate
+
 You can then access the application through the following URL:
 
-    http://127.0.0.1:8000
+    http://127.0.0.1:8080
+
+(the port comes from `NGINX_PORT` in `.env`)
 
 Run tests inside the container
 
-    docker compose exec -T php vendor/bin/codecept build
-    docker compose exec -T php vendor/bin/codecept run
+    docker compose exec php vendor/bin/codecept build
+    docker compose exec php vendor/bin/codecept run
 
-**NOTES:** 
-- Minimum required Docker engine version `17.04` for development (see [Performance tuning for volume mounts](https://docs.docker.com/docker-for-mac/osxfs-caching/))
-- The default configuration uses a host-volume in your home directory `~/.composer-docker/cache` for Composer caches
+**NOTES:**
+- The default configuration uses a host-volume in your home directory `~/.composer-docker/cache` for Composer caches.
+- Postgres data persists in the named volume `db-data`; remove it with `docker compose down -v` to reset the database.
+- Xdebug is bundled but disabled by default. Enable it per-run with `XDEBUG_MODE=debug docker compose up -d`, or set `XDEBUG_MODE=debug` in `.env`.
 
 
 CONFIGURATION
@@ -128,20 +133,23 @@ CONFIGURATION
 
 ## Database
 
-Edit the file `config/db.php` with real data, for example:
+When running via Docker, `config/db.php` and `config/test_db.php` read the connection from
+`POSTGRES_HOST` / `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` in `.env` — no manual editing needed.
+
+Running without Docker (e.g. against a local Postgres/MySQL install)? Edit `config/db.php` directly, for example:
 
 ```php
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=yii2basic',
-    'username' => 'root',
-    'password' => '1234',
+    'dsn' => 'pgsql:host=localhost;port=5432;dbname=yii2',
+    'username' => 'yii2',
+    'password' => 'secret',
     'charset' => 'utf8',
 ];
 ```
 
 **NOTES:**
-- Yii won't create the database for you, this has to be done manually before you can access it.
+- The Docker Postgres container creates the database from `POSTGRES_DB` automatically; outside Docker you still need to create it manually before you can access it.
 - Check and edit the other files in the `config/` directory to customize your application as required.
 - Refer to the README in the `tests` directory for information specific to basic application tests.
 

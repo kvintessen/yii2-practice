@@ -33,6 +33,13 @@ FROM base AS dev
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
+RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS linux-headers \
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && apk del .build-deps
+
+COPY docker/php/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+
 CMD ["php-fpm", "-F"]
 
 FROM base AS prod
