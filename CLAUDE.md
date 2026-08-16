@@ -64,6 +64,7 @@ php yii migrate/create create_xxx_table              # scaffold a new migration
 php yii migrate/down                                 # revert last
 
 # Console commands live in commands/ (e.g. `php yii hello`)
+php yii seed/all                                    # demo data: customers, categories, products, orders (idempotent)
 ```
 
 Acceptance tests default to `PhpBrowser` against the built-in PHP server (`--env php-builtin`).
