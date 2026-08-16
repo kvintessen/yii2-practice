@@ -84,11 +84,25 @@ output under `tests/Support/output`.
   entry points. `LoginForm` looks up `User::findByUsername()` and validates via
   `security->validatePassword()`; `SignupForm::signup()` hashes with
   `security->generatePasswordHash()` and calls `User::generateAuthKey()` before saving.
-- **User table** is created by migration, not fixtures/seeds baked into the schema file. The
-  migration seeds two demo accounts (`admin`/`demo`, ids 100/101) with fixed `auth_key`/
-  `access_token` values that the test suite asserts against — treat those ids/keys as stable
-  test fixtures, not incidental data, and mirror them in `tests/Support/data` fixtures if you add
-  more.
+- **Migrations are schema-only** — no seeded rows, including the RBAC `admin` role's *item*
+  (structural) but not its *assignment* to any user (that's data). Two separate mechanisms cover
+  data, and they intentionally don't share rows:
+  - **Dev/prod**: `php yii seed/all` (`commands/SeedController.php`) creates the `admin`/`admin`
+    and `demo`/`demo` accounts (plus customers/catalog/orders) and assigns the `admin` RBAC role.
+    Idempotent, ids are auto-increment (not pinned).
+  - **Tests**: `tests/Support/Fixtures/UserFixture.php` (+ `AdminRoleAssignmentFixture.php`) load
+    the fixed `admin`/`demo` accounts at **ids 100/101** with fixed `auth_key`/`access_token`
+    values (`tests/Support/data/user.php`) that the test suite asserts on directly — declare a
+    public `_fixtures()` method returning `['users' => UserFixture::class]` (add
+    `AdminRoleAssignmentFixture::class` too if the test needs the `admin` role, e.g. hitting
+    `admin/*` routes) on any Unit test or Cest that touches user id 100/101 or `admin`/`demo`
+    credentials. The Yii2 Codeception module loads these fresh before each test and truncates the
+    `user` table after, so the test database stays empty between runs — do not add new baked-in
+    rows to migrations to work around this.
+  - **Acceptance suite caveat**: `tests/Acceptance.suite.yml` sets `transaction: false` — the app
+    under test runs in a separate PHP process (the built-in webserver), which only sees committed
+    data, so any ORM/fixture writes from the test process must not be wrapped in a
+    rolled-back transaction or that process never sees them.
 - **Mailer**: `MailerInterface` is registered as a DI singleton in `config/web.php` (and
   console) pointing at `yii\symfonymailer\Mailer` with `useFileTransport => true` (mail written to
   files, not sent) by default. In tests, `tests/Support/MailerBootstrap.php` re-registers the DI

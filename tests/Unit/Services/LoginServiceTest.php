@@ -7,12 +7,18 @@ namespace app\tests\Unit\Services;
 use app\models\LoginForm;
 use app\services\CartMergeService;
 use app\services\LoginService;
+use app\tests\Support\Fixtures\UserFixture;
 use Yii;
 use yii\base\Security;
 
 final class LoginServiceTest extends \Codeception\Test\Unit
 {
     private LoginService $_service;
+
+    public function _fixtures(): array
+    {
+        return ['users' => UserFixture::class];
+    }
 
     protected function _before()
     {

@@ -7,11 +7,17 @@ namespace app\tests\Unit\Services;
 use app\models\Cart;
 use app\models\Product;
 use app\services\CartMergeService;
+use app\tests\Support\Fixtures\UserFixture;
 use Yii;
 
 final class CartMergeServiceTest extends \Codeception\Test\Unit
 {
     private CartMergeService $_service;
+
+    public function _fixtures(): array
+    {
+        return ['users' => UserFixture::class];
+    }
 
     protected function _before()
     {

@@ -5,12 +5,12 @@ declare(strict_types=1);
 use yii\db\Migration;
 
 /**
- * Creates the 'admin' RBAC role and assigns it to the seeded demo admin user (id 100).
+ * Creates the 'admin' RBAC role. Assigning it to specific users is data, not
+ * schema, so it happens outside migrations — via `php yii seed/all` for
+ * dev/prod, or test fixtures for the test suite.
  */
 class m260816_161500_seed_admin_role extends Migration
 {
-    private const ADMIN_USER_ID = 100;
-
     /**
      * {@inheritdoc}
      */
@@ -21,8 +21,6 @@ class m260816_161500_seed_admin_role extends Migration
         $admin = $authManager->createRole('admin');
         $admin->description = 'Full access to the admin panel.';
         $authManager->add($admin);
-
-        $authManager->assign($admin, self::ADMIN_USER_ID);
     }
 
     /**

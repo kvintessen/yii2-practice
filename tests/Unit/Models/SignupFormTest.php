@@ -5,9 +5,15 @@ declare(strict_types=1);
 namespace app\tests\Unit\Models;
 
 use app\models\SignupForm;
+use app\tests\Support\Fixtures\UserFixture;
 
 final class SignupFormTest extends \Codeception\Test\Unit
 {
+    public function _fixtures(): array
+    {
+        return ['users' => UserFixture::class];
+    }
+
     public function testValidationWithEmptyCredentials()
     {
         $model = new SignupForm();

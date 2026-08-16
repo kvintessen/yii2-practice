@@ -10,11 +10,17 @@ use app\models\Product;
 use app\services\Order\InsufficientStockException;
 use app\services\Order\PlaceOrderCommand;
 use app\services\Order\PlaceOrderHandler;
+use app\tests\Support\Fixtures\UserFixture;
 use DomainException;
 
 final class PlaceOrderHandlerTest extends \Codeception\Test\Unit
 {
     private PlaceOrderHandler $_handler;
+
+    public function _fixtures(): array
+    {
+        return ['users' => UserFixture::class];
+    }
 
     protected function _before()
     {

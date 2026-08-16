@@ -4,10 +4,20 @@ declare(strict_types=1);
 
 namespace app\tests\Functional\Admin;
 
+use app\tests\Support\Fixtures\AdminRoleAssignmentFixture;
+use app\tests\Support\Fixtures\UserFixture;
 use app\tests\Support\FunctionalTester;
 
 final class AccessCest
 {
+    public function _fixtures(): array
+    {
+        return [
+            'users' => UserFixture::class,
+            'adminRole' => AdminRoleAssignmentFixture::class,
+        ];
+    }
+
     public function guestIsRedirectedToLogin(FunctionalTester $I)
     {
         // amOnRoute() follows the redirect automatically, so assert on where it lands.

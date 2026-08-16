@@ -6,9 +6,15 @@ namespace app\tests\Unit\Models;
 
 use app\models\Cart;
 use app\models\Product;
+use app\tests\Support\Fixtures\UserFixture;
 
 final class CartTest extends \Codeception\Test\Unit
 {
+    public function _fixtures(): array
+    {
+        return ['users' => UserFixture::class];
+    }
+
     private function makeProduct(string $sku, string $price, int $stock = 10): Product
     {
         $product = new Product([

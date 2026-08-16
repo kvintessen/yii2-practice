@@ -5,11 +5,21 @@ declare(strict_types=1);
 namespace app\tests\Functional\Admin;
 
 use app\models\Category;
+use app\tests\Support\Fixtures\AdminRoleAssignmentFixture;
+use app\tests\Support\Fixtures\UserFixture;
 use app\tests\Support\FunctionalTester;
 use yii\helpers\Url;
 
 final class CategoryCest
 {
+    public function _fixtures(): array
+    {
+        return [
+            'users' => UserFixture::class,
+            'adminRole' => AdminRoleAssignmentFixture::class,
+        ];
+    }
+
     public function _before(FunctionalTester $I)
     {
         $I->amLoggedInAs(100);

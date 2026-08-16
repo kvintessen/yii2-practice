@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace app\tests\Functional;
 
+use app\tests\Support\Fixtures\UserFixture;
 use app\tests\Support\FunctionalTester;
 
 final class SignupFormCest
 {
+    public function _fixtures(): array
+    {
+        return ['users' => UserFixture::class];
+    }
+
     public function _before(FunctionalTester $I)
     {
         $I->amOnRoute('site/signup');

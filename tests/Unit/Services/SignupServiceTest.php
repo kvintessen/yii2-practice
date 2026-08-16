@@ -8,11 +8,17 @@ use app\models\SignupForm;
 use app\models\User;
 use app\services\CartMergeService;
 use app\services\SignupService;
+use app\tests\Support\Fixtures\UserFixture;
 use yii\base\Security;
 
 final class SignupServiceTest extends \Codeception\Test\Unit
 {
     private SignupService $_service;
+
+    public function _fixtures(): array
+    {
+        return ['users' => UserFixture::class];
+    }
 
     protected function _before()
     {

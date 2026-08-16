@@ -5,9 +5,15 @@ declare(strict_types=1);
 namespace app\tests\Unit\Models;
 
 use app\models\User;
+use app\tests\Support\Fixtures\UserFixture;
 
 final class UserTest extends \Codeception\Test\Unit
 {
+    public function _fixtures(): array
+    {
+        return ['users' => UserFixture::class];
+    }
+
     public function testFindUserById()
     {
         /** @var User $user */

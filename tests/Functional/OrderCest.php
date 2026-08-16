@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace app\tests\Functional;
 
 use app\models\Order;
+use app\tests\Support\Fixtures\UserFixture;
 use app\tests\Support\FunctionalTester;
 
 final class OrderCest
 {
+    public function _fixtures(): array
+    {
+        return ['users' => UserFixture::class];
+    }
+
     private function makeOrderForUser(int $userId, string $total): Order
     {
         $order = new Order([

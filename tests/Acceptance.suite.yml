@@ -12,7 +12,14 @@ modules:
     - Yii2:
         part: orm
         entryScript: index-test.php
-        cleanup: false
+        # Acceptance requests are handled by a separate PHP process (the
+        # built-in webserver), which only ever sees committed data — so ORM
+        # actions/fixtures run from the test process must not be wrapped in
+        # a transaction that gets rolled back, or that process never sees
+        # them (and, as found here, a test's own manual cleanup would get
+        # silently undone by the rollback too).
+        transaction: false
+        cleanup: true
 step_decorators: ~
 
 # webdriver configuration example

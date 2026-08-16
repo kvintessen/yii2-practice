@@ -28,21 +28,6 @@ class m260816_125902_create_user_table extends Migration
         $this->createIndex('idx-user-username', '{{%user}}', 'username', true);
         $this->createIndex('idx-user-email', '{{%user}}', 'email', true);
         $this->createIndex('idx-user-access_token', '{{%user}}', 'access_token', true);
-
-        // Seed the same demo accounts the previous in-memory User model shipped with,
-        // keeping the fixed ids/keys/tokens the existing test suite already asserts on.
-        $now = time();
-        $this->batchInsert(
-            '{{%user}}',
-            ['id', 'username', 'email', 'password_hash', 'auth_key', 'access_token', 'created_at', 'updated_at'],
-            [
-                [100, 'admin', 'admin@example.com', '$2y$13$gYAywKSkhfZDq9FLNdm7buKnvlRxDexf5xipSMAxQPDUxpaptmZJu', 'test100key', '100-token', $now, $now],
-                [101, 'demo', 'demo@example.com', '$2y$13$alRLq1PGVMlGYwS/Y3iy3ewQns1Z8ol8Iq6Zb5k7ZwEhblA1aL29y', 'test101key', '101-token', $now, $now],
-            ],
-        );
-
-        // Keep the id sequence ahead of the seeded rows so real signups don't collide with them.
-        $this->execute("SELECT setval(pg_get_serial_sequence('{{%user}}', 'id'), 101)");
     }
 
     /**

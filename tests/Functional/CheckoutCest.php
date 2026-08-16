@@ -6,10 +6,16 @@ namespace app\tests\Functional;
 
 use app\models\Order;
 use app\models\Product;
+use app\tests\Support\Fixtures\UserFixture;
 use app\tests\Support\FunctionalTester;
 
 final class CheckoutCest
 {
+    public function _fixtures(): array
+    {
+        return ['users' => UserFixture::class];
+    }
+
     private function makeProduct(string $sku, int $stock = 5): Product
     {
         $product = new Product([

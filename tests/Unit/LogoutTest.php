@@ -9,6 +9,7 @@ use app\models\User;
 use app\services\CartMergeService;
 use app\services\LoginService;
 use app\services\SignupService;
+use app\tests\Support\Fixtures\UserFixture;
 use Yii;
 use yii\base\Security;
 use yii\web\IdentityInterface;
@@ -16,6 +17,11 @@ use yii\web\View;
 
 final class LogoutTest extends \Codeception\Test\Unit
 {
+    public function _fixtures(): array
+    {
+        return ['users' => UserFixture::class];
+    }
+
     public function testRenderLogoutLinkWhenUserIsLoggedIn(): void
     {
         $user = User::findIdentity('100');
