@@ -6,6 +6,7 @@ namespace app\controllers;
 
 use app\models\Order;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -29,6 +30,19 @@ class OrderController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function actionIndex(): string
+    {
+        $dataProvider = new ActiveDataProvider([
+            'query' => Order::find()->where(['user_id' => Yii::$app->user->id]),
+            'sort' => ['defaultOrder' => ['created_at' => SORT_DESC]],
+            'pagination' => ['pageSize' => 10],
+        ]);
+
+        return $this->render('index', [
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     public function actionView(int $id): string

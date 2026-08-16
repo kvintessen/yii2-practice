@@ -14,6 +14,8 @@ $this->title = 'Categories';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="category-index">
+    <?= $this->render('/_nav') ?>
+
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p><?= Html::a('New Category', ['create'], ['class' => 'btn btn-primary']) ?></p>

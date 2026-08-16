@@ -26,6 +26,11 @@ $items = [
         'url' => ['/cart/index'],
     ],
     [
+        'label' => 'My Orders',
+        'url' => ['/order/index'],
+        'visible' => !Yii::$app->user->isGuest,
+    ],
+    [
         'label' => 'Login',
         'url' => ['/site/login'],
         'visible' => Yii::$app->user->isGuest,
