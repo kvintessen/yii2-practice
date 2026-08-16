@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use Yii;
-use app\models\ContactForm;
 use app\models\LoginForm;
-use yii\captcha\CaptchaAction;
+use app\models\SignupForm;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\base\Security;
-use yii\mail\MailerInterface;
 use yii\web\Controller;
 use yii\web\ErrorAction;
 use yii\web\Response;
@@ -21,7 +19,6 @@ class SiteController extends Controller
     public function __construct(
         $id,
         $module,
-        private readonly MailerInterface $mailer,
         private readonly Security $security,
         $config = [],
     ) {
@@ -62,11 +59,6 @@ class SiteController extends Controller
         return [
             'error' => [
                 'class' => ErrorAction::class,
-            ],
-            'captcha' => [
-                'class' => CaptchaAction::class,
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-                'transparent' => true,
             ],
         ];
     }
@@ -116,40 +108,29 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays contact page.
+     * Signup action.
      *
      * @return Response|string
      */
-    public function actionContact(): Response|string
+    public function actionSignup(): Response|string
     {
-        $model = new ContactForm();
-
-        $contact = $model->load($this->request->post()) && $model->contact(
-            $this->mailer,
-            Yii::$app->params['adminEmail'],
-            Yii::$app->params['senderEmail'],
-            Yii::$app->params['senderName'],
-        );
-
-        if ($contact) {
-            Yii::$app->session->setFlash(
-                'success',
-                'Thank you for contacting us. We will respond to you as soon as possible.',
-            );
-
-            return $this->refresh();
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
         }
 
-        return $this->render('contact', ['model' => $model]);
-    }
+        $model = new SignupForm($this->security);
 
-    /**
-     * Displays about page.
-     *
-     * @return string
-     */
-    public function actionAbout(): string
-    {
-        return $this->render('about');
+        if ($model->load($this->request->post())) {
+            $user = $model->signup();
+
+            if ($user !== null && Yii::$app->user->login($user)) {
+                return $this->goHome();
+            }
+        }
+
+        $model->password = '';
+        $model->passwordRepeat = '';
+
+        return $this->render('signup', ['model' => $model]);
     }
 }
