@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use Yii;
+use app\models\Category;
 use app\models\LoginForm;
+use app\models\Product;
 use app\models\SignupForm;
 use app\services\LoginService;
 use app\services\SignupService;
@@ -72,7 +74,17 @@ class SiteController extends Controller
      */
     public function actionIndex(): string
     {
-        return $this->render('index');
+        return $this->render('index', [
+            'categories' => Category::find()
+                ->where(['parent_id' => null])
+                ->orderBy('name')
+                ->all(),
+            'newArrivals' => Product::find()
+                ->where(['status' => Product::STATUS_ACTIVE])
+                ->orderBy(['created_at' => SORT_DESC])
+                ->limit(8)
+                ->all(),
+        ]);
     }
 
     /**
