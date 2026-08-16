@@ -18,6 +18,7 @@ $items = $cart?->items ?? [];
     <?php if ($items === []): ?>
         <p>Your cart is empty. <?= Html::a('Browse the catalog', ['/catalog/index']) ?>.</p>
     <?php else: ?>
+        <div class="table-responsive">
         <table class="table table-striped align-middle">
             <thead>
                 <tr>
@@ -67,6 +68,7 @@ $items = $cart?->items ?? [];
                 </tr>
             </tfoot>
         </table>
+        </div>
 
         <?= Html::a('Proceed to checkout', ['/cart/checkout'], ['class' => 'btn btn-primary']) ?>
     <?php endif; ?>
