@@ -15,6 +15,7 @@ use yii\db\ActiveRecord;
  * @property string|null $description
  * @property string $price
  * @property string $sku
+ * @property int $stock
  * @property string $status
  * @property int $created_at
  * @property int $updated_at
@@ -56,6 +57,8 @@ class Product extends ActiveRecord
             [['name', 'slug', 'price', 'sku'], 'required'],
             [['description'], 'string'],
             [['price'], 'number', 'min' => 0],
+            [['stock'], 'default', 'value' => 0],
+            [['stock'], 'integer', 'min' => 0],
             [['status'], 'default', 'value' => self::STATUS_DRAFT],
             [['status'], 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_ACTIVE]],
             [['name', 'slug'], 'string', 'max' => 255],
