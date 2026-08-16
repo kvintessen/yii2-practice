@@ -24,7 +24,8 @@ services:
     ports:
       - "${NGINX_PORT:-8080}:80"
     depends_on:
-      - php
+      php:
+        condition: service_healthy
 
   db:
     image: postgres:16-alpine

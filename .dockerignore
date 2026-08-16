@@ -6,4 +6,14 @@ runtime
 web/assets
 **/*.md
 .agents
+.claude
+.idea
+.vscode
+.playwright-mcp
 skills-lock.json
+docker-compose.yml
+tests
+codeception.yml
+c3.php
+phpcs.xml.dist
+phpstan.neon
