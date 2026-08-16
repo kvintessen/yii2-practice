@@ -145,6 +145,16 @@ main > .container {
     padding-left: .5rem;
 }
 
+.admin-sidebar-account {
+    margin-top: 1rem;
+    padding-top: .75rem;
+    border-top: 1px solid var(--bs-border-color);
+}
+
+.admin-sidebar-logout {
+    cursor: pointer;
+}
+
 /* add sorting icons to gridview sort links */
 a.asc:after, a.desc:after {
     content: '';

@@ -37,6 +37,18 @@ $config = [
             'identityClass' => \app\models\User::class,
             'enableAutoLogin' => true,
         ],
+        // separate identity/session from the storefront 'user' component so
+        // logging into the shop never grants admin access (and vice versa),
+        // even for an account that holds the 'admin' RBAC role
+        'adminUser' => [
+            'class' => \yii\web\User::class,
+            'identityClass' => \app\models\User::class,
+            'enableAutoLogin' => true,
+            'loginUrl' => ['/admin/site/login'],
+            'idParam' => '__admin_id',
+            'authTimeoutParam' => '__admin_expire',
+            'identityCookie' => ['name' => '_adminIdentity', 'httpOnly' => true],
+        ],
         'authManager' => [
             'class' => \yii\rbac\DbManager::class,
         ],
@@ -79,6 +91,8 @@ $config = [
                 'orders/<id:\d+>' => 'order/view',
 
                 'admin' => 'admin/category/index',
+                'admin/login' => 'admin/site/login',
+                'admin/logout' => 'admin/site/logout',
                 'admin/categories' => 'admin/category/index',
                 'admin/categories/create' => 'admin/category/create',
                 'admin/categories/<id:\d+>/update' => 'admin/category/update',

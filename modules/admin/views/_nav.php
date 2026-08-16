@@ -44,5 +44,14 @@ $items = [
                 </li>
             <?php endforeach; ?>
         </ul>
+
+        <div class="admin-sidebar-account">
+            <div class="text-body-secondary small mb-1">
+                <?= Html::encode(Yii::$app->adminUser->identity?->username ?? '') ?>
+            </div>
+            <?= Html::beginForm(['/admin/logout'], 'post') ?>
+            <?= Html::submitButton('Log out', ['class' => 'admin-sidebar-link admin-sidebar-logout p-0 border-0 bg-transparent']) ?>
+            <?= Html::endForm() ?>
+        </div>
     </nav>
 </div>

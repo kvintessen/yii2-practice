@@ -23,7 +23,7 @@ final class ProductCest
 
     public function _before(FunctionalTester $I)
     {
-        $I->amLoggedInAs(100);
+        $I->amLoggedInAsAdmin(100);
     }
 
     public function createAssignsCategoriesAndCanBeDeleted(FunctionalTester $I)

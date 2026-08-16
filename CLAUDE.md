@@ -80,10 +80,22 @@ output under `tests/Support/output`.
   `yii\base\Security` via constructor injection (readonly property) rather than calling
   `Yii::$app->security` directly — follow this pattern for new auth-related code so it stays
   testable without a full app instance.
-- **Auth flow**: `SiteController::actionLogin/actionSignup/actionLogout` are the only site auth
-  entry points. `LoginForm` looks up `User::findByUsername()` and validates via
+- **Auth flow**: `SiteController::actionLogin/actionSignup/actionLogout` are the only storefront
+  auth entry points. `LoginForm` looks up `User::findByUsername()` and validates via
   `security->validatePassword()`; `SignupForm::signup()` hashes with
   `security->generatePasswordHash()` and calls `User::generateAuthKey()` before saving.
+- **Admin auth is a fully separate session from the storefront one**, same `User` model/table.
+  `config/web.php` (and `config/test.php`) register a second `adminUser` component
+  (`yii\web\User`, its own `idParam`/`authTimeoutParam`/`identityCookie` so it doesn't collide
+  with the storefront `user` component's session state) alongside the default `user` component.
+  `modules/admin/controllers/SiteController::actionLogin/actionLogout` authenticate against
+  `Yii::$app->adminUser` via `services/AdminLoginService`, which additionally rejects the login
+  outright (`authManager->checkAccess($user->id, 'admin')`) unless the account holds the `admin`
+  RBAC role — so a storefront login never grants admin access and vice versa, even for an account
+  that has the role. `AdminModule::beforeAction` gates every other admin action on
+  `Yii::$app->adminUser`, with `site/login` and `site/logout` explicitly exempted (else you could
+  never reach the login page). New code that needs to check admin auth state must reference
+  `Yii::$app->adminUser`, not `Yii::$app->user`.
 - **Migrations are schema-only** — no seeded rows, including the RBAC `admin` role's *item*
   (structural) but not its *assignment* to any user (that's data). Two separate mechanisms cover
   data, and they intentionally don't share rows:

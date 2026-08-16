@@ -29,5 +29,16 @@ parameters:
 
     ignoreErrors:
         - '#Unsafe usage of new static\(\).#'
+        # adminUser (config/web.php, config/test.php) is a dynamically configured
+        # component, same as the framework's own 'user' — but only 'user' has a
+        # @property annotation on yii\web\Application, so PHPStan doesn't know it.
+        - '#Access to an undefined property [^:]+::\$adminUser\.#'
+        # Yii::$app->controller has no PHPDoc type, so PHPStan infers it as
+        # non-nullable here — but it genuinely is null when a view renders
+        # outside an active controller action (e.g. Unit tests rendering a
+        # layout directly), which is exactly the case this guards against.
+        -
+            identifier: nullsafe.neverNull
+            path: modules/admin/views/_nav.php
 
     tmpDir: %currentWorkingDirectory%/runtime

@@ -22,7 +22,7 @@ final class CategoryCest
 
     public function _before(FunctionalTester $I)
     {
-        $I->amLoggedInAs(100);
+        $I->amLoggedInAsAdmin(100);
     }
 
     public function createUpdateAndDeleteACategory(FunctionalTester $I)

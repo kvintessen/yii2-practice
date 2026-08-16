@@ -22,22 +22,29 @@ final class AccessCest
     {
         // amOnRoute() follows the redirect automatically, so assert on where it lands.
         $I->amOnRoute('admin/category/index');
-        $I->seeInCurrentUrl('site%2Flogin');
-        $I->see('Login to your account');
+        $I->seeInCurrentUrl('admin%2Fsite%2Flogin');
+        $I->see('Admin sign in');
     }
 
     public function nonAdminIsForbidden(FunctionalTester $I)
     {
-        $I->amLoggedInAs(101); // demo, no 'admin' role
+        $I->amLoggedInAsAdmin(101); // demo, no 'admin' role
         $I->amOnRoute('admin/category/index');
         $I->seeResponseCodeIs(403);
     }
 
     public function adminCanReachTheDashboard(FunctionalTester $I)
     {
-        $I->amLoggedInAs(100); // admin, has the 'admin' role
+        $I->amLoggedInAsAdmin(100); // admin, has the 'admin' role
         $I->amOnRoute('admin/category/index');
         $I->seeResponseCodeIsSuccessful();
         $I->see('Categories', 'h1');
+    }
+
+    public function storefrontLoginDoesNotGrantAdminAccess(FunctionalTester $I)
+    {
+        $I->amLoggedInAs(100); // storefront session only, not adminUser
+        $I->amOnRoute('admin/category/index');
+        $I->seeInCurrentUrl('admin%2Fsite%2Flogin');
     }
 }

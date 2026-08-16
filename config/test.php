@@ -40,6 +40,13 @@ return [
         'user' => [
             'identityClass' => \app\models\User::class,
         ],
+        'adminUser' => [
+            'class' => \yii\web\User::class,
+            'identityClass' => \app\models\User::class,
+            'loginUrl' => ['/admin/site/login'],
+            'idParam' => '__admin_id',
+            'authTimeoutParam' => '__admin_expire',
+        ],
         'request' => [
             'cookieValidationKey' => 'test',
             'enableCsrfValidation' => false,

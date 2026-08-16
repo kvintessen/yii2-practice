@@ -22,7 +22,7 @@ final class OrderCest
 
     public function _before(FunctionalTester $I)
     {
-        $I->amLoggedInAs(100); // admin
+        $I->amLoggedInAsAdmin(100); // admin
     }
 
     public function adminCanListOrders(FunctionalTester $I)
