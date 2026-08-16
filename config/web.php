@@ -5,6 +5,7 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
+    'name' => 'TrustCart',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'container' => [
