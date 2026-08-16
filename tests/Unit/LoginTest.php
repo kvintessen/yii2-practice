@@ -6,6 +6,7 @@ namespace app\tests\Unit;
 
 use app\controllers\SiteController;
 use app\models\User;
+use app\services\CartMergeService;
 use app\services\LoginService;
 use app\services\SignupService;
 use Yii;
@@ -19,8 +20,8 @@ final class LoginTest extends \Codeception\Test\Unit
         $controller = new SiteController(
             'site',
             Yii::$app,
-            new LoginService(new Security()),
-            new SignupService(new Security()),
+            new LoginService(new Security(), new CartMergeService()),
+            new SignupService(new Security(), new CartMergeService()),
         );
 
         $view = new View(['context' => $controller]);

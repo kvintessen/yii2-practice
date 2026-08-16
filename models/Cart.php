@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -61,6 +62,29 @@ class Cart extends ActiveRecord
     public static function findOrCreateForSession(string $sessionId): self
     {
         return self::findOne(['session_id' => $sessionId]) ?? self::create(['session_id' => $sessionId]);
+    }
+
+    /**
+     * Resolves the current visitor's cart, creating one if none exists yet.
+     * Use for actions that add to the cart; prefer findForCurrentVisitor()
+     * for read-only access so browsing alone doesn't create empty carts.
+     */
+    public static function findOrCreateForCurrentVisitor(): self
+    {
+        if (!Yii::$app->user->isGuest) {
+            return self::findOrCreateForUser((int) Yii::$app->user->id);
+        }
+
+        return self::findOrCreateForSession(Yii::$app->session->getId());
+    }
+
+    public static function findForCurrentVisitor(): self|null
+    {
+        if (!Yii::$app->user->isGuest) {
+            return self::findOne(['user_id' => Yii::$app->user->id]);
+        }
+
+        return self::findOne(['session_id' => Yii::$app->session->getId()]);
     }
 
     /**

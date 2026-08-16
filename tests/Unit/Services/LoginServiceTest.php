@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\tests\Unit\Services;
 
 use app\models\LoginForm;
+use app\services\CartMergeService;
 use app\services\LoginService;
 use Yii;
 use yii\base\Security;
@@ -15,7 +16,7 @@ final class LoginServiceTest extends \Codeception\Test\Unit
 
     protected function _before()
     {
-        $this->_service = new LoginService(new Security());
+        $this->_service = new LoginService(new Security(), new CartMergeService());
     }
 
     protected function _after()

@@ -4,14 +4,26 @@ declare(strict_types=1);
 
 /** @var yii\web\View $this */
 
+use app\models\Cart;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 use yii\helpers\Html;
+
+$cart = Cart::findForCurrentVisitor();
+$cartItemCount = $cart !== null ? count($cart->items) : 0;
 
 $items = [
     [
         'label' => 'Home',
         'url' => ['/site/index'],
+    ],
+    [
+        'label' => 'Catalog',
+        'url' => ['/catalog/index'],
+    ],
+    [
+        'label' => "Cart ($cartItemCount)",
+        'url' => ['/cart/index'],
     ],
     [
         'label' => 'Login',

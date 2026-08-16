@@ -6,12 +6,15 @@ namespace app\services;
 
 use app\models\SignupForm;
 use app\models\User;
+use Yii;
 use yii\base\Security;
 
 final class SignupService
 {
-    public function __construct(private readonly Security $security)
-    {
+    public function __construct(
+        private readonly Security $security,
+        private readonly CartMergeService $cartMergeService,
+    ) {
     }
 
     public function signup(SignupForm $form): User|null
@@ -26,6 +29,12 @@ final class SignupService
         $user->password_hash = $this->security->generatePasswordHash($form->password);
         $user->generateAuthKey();
 
-        return $user->save() ? $user : null;
+        if (!$user->save()) {
+            return null;
+        }
+
+        $this->cartMergeService->mergeGuestCartIntoUser(Yii::$app->session->getId(), $user->id);
+
+        return $user;
     }
 }

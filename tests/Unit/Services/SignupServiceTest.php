@@ -6,6 +6,7 @@ namespace app\tests\Unit\Services;
 
 use app\models\SignupForm;
 use app\models\User;
+use app\services\CartMergeService;
 use app\services\SignupService;
 use yii\base\Security;
 
@@ -15,7 +16,7 @@ final class SignupServiceTest extends \Codeception\Test\Unit
 
     protected function _before()
     {
-        $this->_service = new SignupService(new Security());
+        $this->_service = new SignupService(new Security(), new CartMergeService());
     }
 
     public function testSignupWithEmptyCredentials()
