@@ -1,6 +1,98 @@
+/* ---- brand palette: deep navy + gold, luxury/prestige positioning ---- */
+
 :root {
-    --brand-primary: #6366F1;
-    --brand-primary-dark: #4F46E5;
+    /* fixed navy used for self-contained colored surfaces (hero, login panel,
+       badges) that carry their own white text and don't need to adapt to
+       the page's light/dark background */
+    --luxury-navy: #002349;
+    --luxury-navy-deep: #00152B;
+
+    /* gold stays constant across themes; only ever used for icons, borders,
+       and decorative trim — never as small text/foreground, since gold on
+       white/near-black sits at ~4:1 contrast (passes 3:1 non-text, not the
+       4.5:1 normal-text minimum) */
+    --brand-accent: #957C3D;
+    --brand-accent-dark: #7A6530;
+    --brand-accent-rgb: 149, 124, 61;
+
+    /* interactive brand color (links, active states, primary buttons) —
+       adapts per theme below so it stays legible against the navbar/body */
+    --brand-primary: #002349;
+    --brand-primary-dark: #001529;
+
+    --bs-primary: #002349;
+    --bs-primary-rgb: 0, 35, 73;
+    --bs-primary-text-emphasis: #002349;
+    --bs-primary-bg-subtle: #E4E9EF;
+    --bs-primary-border-subtle: #B9C6D6;
+    --bs-link-color: #002349;
+    --bs-link-color-rgb: 0, 35, 73;
+    --bs-link-hover-color: #001529;
+    --bs-link-hover-color-rgb: 0, 21, 41;
+    --bs-focus-ring-color: rgba(0, 35, 73, .25);
+}
+
+[data-bs-theme="dark"] {
+    --brand-primary: #7BA0C9;
+    --brand-primary-dark: #587DA6;
+
+    --bs-primary: #7BA0C9;
+    --bs-primary-rgb: 123, 160, 201;
+    --bs-primary-text-emphasis: #9CBADA;
+    --bs-primary-bg-subtle: #0F2438;
+    --bs-primary-border-subtle: #2C4A66;
+    --bs-link-color: #7BA0C9;
+    --bs-link-color-rgb: 123, 160, 201;
+    --bs-link-hover-color: #9CBADA;
+    --bs-link-hover-color-rgb: 156, 186, 218;
+    --bs-focus-ring-color: rgba(123, 160, 201, .25);
+}
+
+/* .btn-primary ships its own hardcoded --bs-btn-* set independent of
+   --bs-primary, so it needs its own override per theme */
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #002349;
+    --bs-btn-border-color: #002349;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #001529;
+    --bs-btn-hover-border-color: #001529;
+    --bs-btn-focus-shadow-rgb: 0, 35, 73;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #001529;
+    --bs-btn-active-border-color: #001529;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #002349;
+    --bs-btn-disabled-border-color: #002349;
+}
+
+[data-bs-theme="dark"] .btn-primary {
+    --bs-btn-color: #06121F;
+    --bs-btn-bg: #7BA0C9;
+    --bs-btn-border-color: #7BA0C9;
+    --bs-btn-hover-color: #06121F;
+    --bs-btn-hover-bg: #9CBADA;
+    --bs-btn-hover-border-color: #9CBADA;
+    --bs-btn-focus-shadow-rgb: 123, 160, 201;
+    --bs-btn-active-color: #06121F;
+    --bs-btn-active-bg: #9CBADA;
+    --bs-btn-active-border-color: #9CBADA;
+    --bs-btn-disabled-color: #06121F;
+    --bs-btn-disabled-bg: #7BA0C9;
+    --bs-btn-disabled-border-color: #7BA0C9;
+}
+
+/* checkboxes/radios and pagination "current page" ship their own hardcoded
+   blue too, independent of --bs-primary; self-contained fills (own text on
+   own background) so one fixed navy works for both themes */
+.form-check-input:checked {
+    background-color: var(--luxury-navy);
+    border-color: var(--luxury-navy);
+}
+
+.pagination {
+    --bs-pagination-active-bg: var(--luxury-navy);
+    --bs-pagination-active-border-color: var(--luxury-navy);
 }
 
 main > .container {
@@ -62,7 +154,7 @@ a.desc:after {
     background: color-mix(in srgb, var(--bs-body-bg) 88%, transparent);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--bs-border-color-translucent);
+    border-bottom: 2px solid var(--brand-accent);
     padding-top: .6rem;
     padding-bottom: .6rem;
     box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
@@ -153,7 +245,7 @@ a.desc:after {
     height: 1.1rem;
     padding: 0 .3rem;
     border-radius: 999px;
-    background: var(--brand-primary);
+    background: var(--luxury-navy);
     color: #fff;
     font-size: .65rem;
     font-weight: 700;
@@ -282,7 +374,8 @@ a.desc:after {
 }
 
 .login-brand-panel {
-    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 60%, #4338CA 100%);
+    background: linear-gradient(135deg, var(--luxury-navy) 0%, var(--luxury-navy-deep) 100%);
+    border-right: 3px solid var(--brand-accent);
     min-height: 480px;
 }
 
@@ -307,7 +400,7 @@ a.desc:after {
 }
 
 .login-btn {
-    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark));
+    background: linear-gradient(135deg, var(--luxury-navy), var(--luxury-navy-deep));
     border: none;
     font-weight: 600;
     letter-spacing: .02em;
@@ -362,7 +455,8 @@ a.desc:after {
 /* ---- storefront home page ---- */
 
 .home-hero {
-    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 60%, #4338CA 100%);
+    background: linear-gradient(135deg, var(--luxury-navy) 0%, var(--luxury-navy-deep) 100%);
+    border-bottom: 3px solid var(--brand-accent);
 }
 
 .home-hero-subtext {
@@ -370,7 +464,7 @@ a.desc:after {
 }
 
 .home-hero-icon {
-    color: rgba(255, 255, 255, .25);
+    color: rgba(var(--brand-accent-rgb), .45);
 }
 
 .category-card {
@@ -399,9 +493,9 @@ a.desc:after {
 .category-card-icon {
     display: inline-flex;
     flex-shrink: 0;
-    color: var(--brand-primary);
+    color: var(--brand-accent);
 }
 
 .home-benefits svg {
-    color: var(--brand-primary);
+    color: var(--brand-accent);
 }
