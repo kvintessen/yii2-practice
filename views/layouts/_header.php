@@ -11,7 +11,7 @@ use yii\bootstrap5\NavBar;
 $cart = Cart::findForCurrentVisitor();
 $cartItemCount = $cart !== null ? count($cart->items) : 0;
 
-$route = Yii::$app->controller->route;
+$route = Yii::$app->controller?->route ?? '';
 
 $isActive = static fn (string $r): bool => $route === $r || str_starts_with($route, $r . '/');
 

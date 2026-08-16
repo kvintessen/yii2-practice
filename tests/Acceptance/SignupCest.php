@@ -30,6 +30,7 @@ final class SignupCest
         $I->click('signup-button');
 
         $I->expectTo('be logged in as the new user');
-        $I->see('Logout');
+        $I->see('acceptance_user', '.dropdown-header');
+        $I->see('Log out');
     }
 }

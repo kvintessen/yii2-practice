@@ -65,7 +65,7 @@ final class SignupFormCest
             'SignupForm[password]' => 'password1',
             'SignupForm[passwordRepeat]' => 'password1',
         ]);
-        $I->see('Logout (brand_new_user)');
+        $I->see('brand_new_user', '.dropdown-header');
         $I->dontSeeElement('form#signup-form');
     }
 }

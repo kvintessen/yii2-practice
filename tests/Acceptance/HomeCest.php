@@ -14,8 +14,8 @@ final class HomeCest
         $I->amOnPage(Url::toRoute('/site/index'));
         $I->see(\Yii::$app->name);
 
-        $I->seeLink('Login');
-        $I->click('Login');
+        $I->seeLink('Log in');
+        $I->click('Log in');
 
         $I->see('Login to your account');
     }

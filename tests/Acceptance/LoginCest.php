@@ -26,6 +26,7 @@ final class LoginCest
         $I->click('login-button');
 
         $I->expectTo('see user info');
-        $I->see('Logout');
+        $I->see('admin', '.dropdown-header');
+        $I->see('Log out');
     }
 }

@@ -61,7 +61,7 @@ final class CheckoutCest
         $I->submitForm('form[action*="cart%2Fadd"]', ['quantity' => '1']);
         $I->see($product->name);
 
-        $I->click('Login');
+        $I->click('Log in');
         $I->submitForm('#login-form', [
             'LoginForm[username]' => 'demo',
             'LoginForm[password]' => 'demo',

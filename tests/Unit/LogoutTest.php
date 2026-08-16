@@ -50,14 +50,14 @@ final class LogoutTest extends \Codeception\Test\Unit
         $html = $view->render('//layouts/main.php', ['content' => 'Hello World°']);
 
         self::assertStringContainsString(
-            'Logout (admin)',
+            'dropdown-header">admin<',
             $html,
-            'Failed asserting that the logout link is rendered for a logged-in user.',
+            'Failed asserting that the account menu shows the logged-in username.',
         );
-        self::assertStringContainsString(
-            'data-method="post"',
+        self::assertMatchesRegularExpression(
+            '/<form[^>]+action="[^"]*site%2Flogout[^"]*"[^>]+method="post"/',
             $html,
-            'Failed asserting that the logout link uses POST method.',
+            'Failed asserting that the logout form uses POST method.',
         );
 
         $controller->actionLogout();
@@ -65,9 +65,9 @@ final class LogoutTest extends \Codeception\Test\Unit
         $html = $view->render('//layouts/main.php', ['content' => 'Hello World°']);
 
         self::assertStringNotContainsString(
-            'Logout (admin)',
+            'dropdown-header">admin<',
             $html,
-            'Failed asserting that the logout link is not rendered after logout.',
+            'Failed asserting that the account menu is not rendered after logout.',
         );
     }
 }
