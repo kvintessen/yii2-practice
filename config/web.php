@@ -54,14 +54,48 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'enableStrictParsing' => true,
             'rules' => [
+                '' => 'site/index',
+                'login' => 'site/login',
+                'logout' => 'site/logout',
+                'signup' => 'site/signup',
+
+                'catalog/category/<category:\d+>' => 'catalog/index',
+                'catalog/product/<id:\d+>' => 'catalog/view',
+                'catalog' => 'catalog/index',
+
+                'cart' => 'cart/index',
+                'cart/add' => 'cart/add',
+                'cart/update-quantity' => 'cart/update-quantity',
+                'cart/remove' => 'cart/remove',
+                'cart/checkout' => 'cart/checkout',
+                'cart/place-order' => 'cart/place-order',
+
+                'orders' => 'order/index',
+                'orders/<id:\d+>' => 'order/view',
+
+                'admin' => 'admin/category/index',
+                'admin/categories' => 'admin/category/index',
+                'admin/categories/create' => 'admin/category/create',
+                'admin/categories/<id:\d+>/update' => 'admin/category/update',
+                'admin/categories/<id:\d+>/delete' => 'admin/category/delete',
+                'admin/categories/<id:\d+>' => 'admin/category/view',
+
+                'admin/products' => 'admin/product/index',
+                'admin/products/create' => 'admin/product/create',
+                'admin/products/<id:\d+>/update' => 'admin/product/update',
+                'admin/products/<id:\d+>/delete' => 'admin/product/delete',
+                'admin/products/<id:\d+>' => 'admin/product/view',
+
+                'admin/orders' => 'admin/order/index',
+                'admin/orders/<id:\d+>/status' => 'admin/order/update-status',
+                'admin/orders/<id:\d+>' => 'admin/order/view',
             ],
         ],
-        */
     ],
     'params' => $params,
 ];
@@ -81,6 +115,17 @@ if (YII_ENV_DEV) {
         // uncomment the following to add your IP if you are not connecting from localhost.
         //'allowedIPs' => ['127.0.0.1', '::1'],
     ];
+
+    // dev-tool routes, kept separate from the app's explicit rule list above
+    $config['components']['urlManager']['rules'] = array_merge(
+        $config['components']['urlManager']['rules'],
+        [
+            'debug' => 'debug/default/index',
+            'debug/<controller:[\w-]+>/<action:[\w-]+>' => 'debug/<controller>/<action>',
+            'gii' => 'gii/default/index',
+            'gii/<controller:[\w-]+>/<action:[\w-]+>' => 'gii/<controller>/<action>',
+        ],
+    );
 }
 
 return $config;
