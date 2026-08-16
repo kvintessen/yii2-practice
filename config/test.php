@@ -20,6 +20,11 @@ return [
     'modules' => [
         'admin' => \app\modules\admin\AdminModule::class,
     ],
+    'container' => [
+        'definitions' => [
+            \yii\widgets\LinkPager::class => \yii\bootstrap5\LinkPager::class,
+        ],
+    ],
     'components' => [
         'db' => $db,
         'authManager' => [

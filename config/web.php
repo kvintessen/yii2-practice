@@ -9,6 +9,14 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'container' => [
+        'definitions' => [
+            // ListView/GridView default to the plain yii\widgets\LinkPager,
+            // which renders <li>/<a> with no page-item/page-link classes —
+            // the Bootstrap 5 pagination CSS never applies, so pages render
+            // as bare links crammed together. Swap in the Bootstrap-aware
+            // pager everywhere instead of per-view.
+            \yii\widgets\LinkPager::class => \yii\bootstrap5\LinkPager::class,
+        ],
         'singletons' => [
             \yii\mail\MailerInterface::class => [
                 'class' => \yii\symfonymailer\Mailer::class,
