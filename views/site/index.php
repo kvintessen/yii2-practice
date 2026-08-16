@@ -5,8 +5,8 @@
 use yii\helpers\Html;
 
 $this->title = 'Home';
-$this->params['meta_description'] = 'A Yii2 application with user registration and login.';
-$this->params['meta_keywords'] = 'yii, yii2, php, framework';
+$this->params['meta_description'] = 'An application with user registration and login.';
+$this->params['meta_keywords'] = 'account, registration, login';
 ?>
 <div class="site-index d-flex align-items-center justify-content-center text-center py-5">
     <div class="site-index-content mx-auto">
