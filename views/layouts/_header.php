@@ -35,13 +35,6 @@ $navLinks = [
         'active' => $isActive('order'),
         'visible' => !Yii::$app->user->isGuest,
     ],
-    [
-        'label' => 'Admin',
-        'url' => ['/admin/category/index'],
-        'icon' => '<path d="M12 2 3 6v6c0 5 3.8 8.7 9 10 5.2-1.3 9-5 9-10V6l-9-4Z"/>',
-        'active' => $isActive('admin'),
-        'visible' => !Yii::$app->user->isGuest && Yii::$app->user->can('admin'),
-    ],
 ];
 
 ?>
