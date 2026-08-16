@@ -25,8 +25,15 @@ $this->render('_head');
 
 <main id="main" class="flex-grow-1" role="main">
     <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])): ?>
-            <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
+        <?php
+        $showHomeLink = Yii::$app->controller?->module?->id !== 'admin';
+        $breadcrumbDepth = count($this->params['breadcrumbs'] ?? []) + ($showHomeLink ? 1 : 0);
+        ?>
+        <?php if ($breadcrumbDepth >= 3): ?>
+            <?= Breadcrumbs::widget([
+                'links' => $this->params['breadcrumbs'],
+                'homeLink' => $showHomeLink ? null : false,
+            ]) ?>
         <?php endif ?>
         <?= Alert::widget() ?>
         <?= $content ?>
