@@ -26,6 +26,9 @@ class Product extends ActiveRecord
     public const STATUS_DRAFT = 'draft';
     public const STATUS_ACTIVE = 'active';
 
+    /** @var int[] Category ids to assign on save; not a DB column. */
+    public array $categoryIds = [];
+
     /**
      * {@inheritdoc}
      */
@@ -60,6 +63,7 @@ class Product extends ActiveRecord
             [['slug'], 'unique'],
             [['sku'], 'unique'],
             [['slug'], 'match', 'pattern' => '/^[a-z0-9-]+$/', 'message' => 'Slug may only contain lowercase letters, numbers, and dashes.'],
+            [['categoryIds'], 'each', 'rule' => ['integer']],
         ];
     }
 

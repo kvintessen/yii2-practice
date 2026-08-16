@@ -24,6 +24,11 @@ $items = [
         'visible' => Yii::$app->user->isGuest,
     ],
     [
+        'label' => 'Admin',
+        'url' => ['/admin/category/index'],
+        'visible' => !Yii::$app->user->isGuest && Yii::$app->user->can('admin'),
+    ],
+    [
         'label' => 'Logout (' . Html::encode(Yii::$app->user->identity?->username ?? '') . ')',
         'url' => ['/site/logout'],
         'linkOptions' => [

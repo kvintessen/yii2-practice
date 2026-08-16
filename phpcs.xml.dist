@@ -11,6 +11,7 @@
     <file>controllers</file>
     <file>mail</file>
     <file>models</file>
+    <file>modules</file>
     <file>services</file>
     <file>tests</file>
 </ruleset>

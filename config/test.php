@@ -17,8 +17,14 @@ return [
         '@npm'   => '@vendor/npm-asset',
     ],
     'language' => 'en-US',
+    'modules' => [
+        'admin' => \app\modules\admin\AdminModule::class,
+    ],
     'components' => [
         'db' => $db,
+        'authManager' => [
+            'class' => \yii\rbac\DbManager::class,
+        ],
         'mailer' => [
             'class' => \yii\symfonymailer\Mailer::class,
             'messageClass' => \yii\symfonymailer\Message::class,
