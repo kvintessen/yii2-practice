@@ -105,10 +105,6 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
 
                     <?php ActiveForm::end(); ?>
 
-                    <div class="text-body-secondary text-center mt-3 small">
-                        You may login with <strong>admin/admin</strong> or <strong>demo/demo</strong>.
-                    </div>
-
                     <div class="text-body-secondary text-center mt-2 small">
                         Don't have an account?
                         <?= Html::a('Sign up', ['site/signup']) ?>
