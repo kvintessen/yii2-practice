@@ -18,6 +18,7 @@ use yii\helpers\Html;
     <?= $form->field($model, 'slug')->textInput(['maxlength' => 255]) ?>
     <?= $form->field($model, 'sku')->textInput(['maxlength' => 64]) ?>
     <?= $form->field($model, 'price')->textInput() ?>
+    <?= $form->field($model, 'stock')->textInput(['type' => 'number', 'min' => 0]) ?>
     <?= $form->field($model, 'status')->dropDownList([
         Product::STATUS_DRAFT => 'Draft',
         Product::STATUS_ACTIVE => 'Active',

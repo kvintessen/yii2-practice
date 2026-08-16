@@ -21,6 +21,7 @@ use yii\db\ActiveRecord;
  * @property int $updated_at
  *
  * @property-read Category[] $categories
+ * @property int[] $categoryIds
  */
 class Product extends ActiveRecord
 {
@@ -28,7 +29,7 @@ class Product extends ActiveRecord
     public const STATUS_ACTIVE = 'active';
 
     /** @var int[] Category ids to assign on save; not a DB column. */
-    public array $categoryIds = [];
+    private array $_categoryIds = [];
 
     /**
      * {@inheritdoc}
@@ -74,5 +75,26 @@ class Product extends ActiveRecord
     {
         return $this->hasMany(Category::class, ['id' => 'category_id'])
             ->viaTable('{{%product_category}}', ['product_id' => 'id']);
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getCategoryIds(): array
+    {
+        return $this->_categoryIds;
+    }
+
+    /**
+     * Accepts an array of ids (from a checked checkbox list) or '' — the
+     * hidden fallback value ActiveField::checkboxList() submits when
+     * nothing is checked, since an unchecked <input type=checkbox> submits
+     * nothing at all.
+     *
+     * @param int[]|string $value
+     */
+    public function setCategoryIds(array|string $value): void
+    {
+        $this->_categoryIds = $value === '' ? [] : array_map('intval', (array) $value);
     }
 }

@@ -47,6 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'name',
             'sku',
             'price',
+            'stock',
             'status',
             ['class' => \yii\grid\ActionColumn::class],
         ],

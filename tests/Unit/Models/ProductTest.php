@@ -74,4 +74,23 @@ final class ProductTest extends \Codeception\Test\Unit
         verify(count($fresh->categories))->equals(1);
         verify($fresh->categories[0]->id)->equals($category->id);
     }
+
+    public function testLoadCoercesEmptyCategoryIdsSubmission()
+    {
+        // ActiveField::checkboxList() submits '' (not an array) when every
+        // checkbox is unchecked or the list is empty — load() must not choke
+        // mass-assigning that onto the typed categoryIds property.
+        $product = new Product();
+
+        verify($product->load(['categoryIds' => ''], ''))->true();
+        verify($product->categoryIds)->equals([]);
+    }
+
+    public function testLoadCastsCategoryIdsToIntegers()
+    {
+        $product = new Product();
+
+        verify($product->load(['categoryIds' => ['3', '5']], ''))->true();
+        verify($product->categoryIds)->equals([3, 5]);
+    }
 }
