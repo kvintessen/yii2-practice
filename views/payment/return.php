@@ -6,6 +6,8 @@ declare(strict_types=1);
 /** @var app\models\Order $order */
 /** @var app\models\Payment|null $payment */
 
+use app\models\Payment;
+use app\services\Payment\PaymentProvider;
 use yii\helpers\Html;
 
 $this->title = 'Payment status';
@@ -21,14 +23,14 @@ $this->params['breadcrumbs'][] = $this->title;
         <p>
             Status: <strong><?= Html::encode($payment->status) ?></strong>
         </p>
-        <?php if ($payment->status === \app\models\Payment::STATUS_PENDING): ?>
+        <?php if ($payment->status === Payment::STATUS_PENDING): ?>
             <p class="text-muted">
                 Confirmation is asynchronous — this page doesn't update itself. Refresh to check again,
                 or watch the order status on <?= Html::a('the order page', ['/order/view', 'id' => $order->id]) ?>.
             </p>
         <?php endif; ?>
 
-        <?php if (!YII_ENV_PROD && $payment->provider === 'fake' && $payment->status === \app\models\Payment::STATUS_PENDING): ?>
+        <?php if (!YII_ENV_PROD && $payment->provider === PaymentProvider::Fake->value && $payment->status === Payment::STATUS_PENDING): ?>
             <div class="card mt-4">
                 <div class="card-body">
                     <h5 class="card-title">Dev tools: simulate the gateway's webhook</h5>
@@ -37,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         provider's server would send to <code>payment/fake/callback</code>.
                     </p>
                     <?= Html::beginForm(
-                        ['/payment/callback', 'provider' => 'fake'],
+                        ['/payment/callback', 'provider' => PaymentProvider::Fake->value],
                         'post',
                         ['class' => 'd-inline', 'id' => 'simulate-success-form'],
                     ) ?>
@@ -46,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= Html::submitButton('Simulate success', ['class' => 'btn btn-success']) ?>
                     <?= Html::endForm() ?>
                     <?= Html::beginForm(
-                        ['/payment/callback', 'provider' => 'fake'],
+                        ['/payment/callback', 'provider' => PaymentProvider::Fake->value],
                         'post',
                         ['class' => 'd-inline', 'id' => 'simulate-failure-form'],
                     ) ?>

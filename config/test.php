@@ -25,24 +25,7 @@ return [
             \yii\widgets\LinkPager::class => \yii\bootstrap5\LinkPager::class,
         ],
         'singletons' => [
-            \app\services\Payment\PaymentGatewayRegistry::class => static function () use ($params) {
-                return new \app\services\Payment\PaymentGatewayRegistry([
-                    Yii::createObject([
-                        'class' => \app\services\Payment\YooKassaGateway::class,
-                        '__construct()' => [$params['yookassaShopId'], $params['yookassaSecretKey']],
-                    ]),
-                    Yii::createObject([
-                        'class' => \app\services\Payment\RobokassaGateway::class,
-                        '__construct()' => [
-                            $params['robokassaMerchantLogin'],
-                            $params['robokassaPassword1'],
-                            $params['robokassaPassword2'],
-                            $params['robokassaTestMode'],
-                        ],
-                    ]),
-                    Yii::createObject(\app\services\Payment\FakeGateway::class),
-                ]);
-            },
+            \app\services\Payment\PaymentGatewayRegistry::class => require __DIR__ . '/payment-gateways.php',
         ],
     ],
     'components' => [

@@ -11,6 +11,6 @@ use RuntimeException;
  * response) — distinct from InvalidWebhookException, which is about not
  * trusting an inbound callback.
  */
-final class PaymentGatewayException extends RuntimeException
+final class PaymentGatewayException extends RuntimeException implements PaymentExceptionInterface
 {
 }

@@ -34,9 +34,9 @@ final class RobokassaGateway implements PaymentGatewayInterface
     ) {
     }
 
-    public function getCode(): string
+    public function getCode(): PaymentProvider
     {
-        return 'robokassa';
+        return PaymentProvider::Robokassa;
     }
 
     public function getLabel(): string
@@ -51,20 +51,14 @@ final class RobokassaGateway implements PaymentGatewayInterface
         // invoice numbers from leaking how many payments the shop has
         // processed.
         $invId = random_int(1, PHP_INT_MAX);
-        $outSum = $this->formatAmount($payment->amount);
+        $outSum = $payment->getFormattedAmount();
 
         $params = [
             'MerchantLogin' => $this->merchantLogin,
             'OutSum' => $outSum,
             'InvId' => $invId,
             'Description' => sprintf('Order #%d', $order->id),
-            'SignatureValue' => md5(sprintf(
-                '%s:%s:%d:%s',
-                $this->merchantLogin,
-                $outSum,
-                $invId,
-                $this->password1,
-            )),
+            'SignatureValue' => $this->buildRequestSignature($outSum, $invId),
             'Culture' => 'ru',
         ];
 
@@ -89,7 +83,7 @@ final class RobokassaGateway implements PaymentGatewayInterface
             throw new InvalidWebhookException('Robokassa callback is missing OutSum/InvId/SignatureValue.');
         }
 
-        $expected = md5(sprintf('%s:%s:%s', $outSum, $invId, $this->password2));
+        $expected = $this->buildCallbackSignature($outSum, $invId);
 
         if (!hash_equals(strtolower($expected), strtolower($signature))) {
             throw new InvalidWebhookException('Robokassa callback signature mismatch.');
@@ -110,8 +104,24 @@ final class RobokassaGateway implements PaymentGatewayInterface
         return 'OK' . $result->externalId;
     }
 
-    private function formatAmount(string $amount): string
+    /**
+     * https://docs.robokassa.ru/ru/pay-interface — signs the outgoing
+     * redirect so Robokassa can confirm the request came from us.
+     */
+    private function buildRequestSignature(string $outSum, int $invId): string
     {
-        return number_format((float) $amount, 2, '.', '');
+        return md5(sprintf('%s:%s:%d:%s', $this->merchantLogin, $outSum, $invId, $this->password1));
+    }
+
+    /**
+     * https://docs.robokassa.ru/ru/notifications-and-redirects — same shape
+     * as the outgoing signature but keyed with Password #2 instead of #1,
+     * which is what actually makes this trustworthy: forging a callback
+     * requires knowing a secret Robokassa never sends anywhere in the
+     * outgoing redirect.
+     */
+    private function buildCallbackSignature(string $outSum, string $invId): string
+    {
+        return md5(sprintf('%s:%s:%s', $outSum, $invId, $this->password2));
     }
 }

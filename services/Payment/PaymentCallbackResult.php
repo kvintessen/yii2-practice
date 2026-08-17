@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace app\services\Payment;
 
-final class PaymentCallbackResult
+final readonly class PaymentCallbackResult
 {
     public function __construct(
-        public readonly string $externalId,
-        public readonly PaymentStatus $status,
-        public readonly string $rawPayload,
+        public string $externalId,
+        public PaymentStatus $status,
+        public string $rawPayload,
     ) {
     }
 }

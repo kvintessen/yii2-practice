@@ -36,9 +36,13 @@ final class PaymentCallbackHandler
         $transaction = $db->beginTransaction();
 
         try {
-            $payment = Payment::find()
-                ->where(['provider' => $providerCode, 'external_id' => $result->externalId])
-                ->one();
+            // Locked for the rest of the transaction: two near-simultaneous
+            // deliveries of the same callback (providers do retry) must not
+            // both read "pending" and both act on it.
+            $payment = Payment::findBySql(
+                'SELECT * FROM {{%payment}} WHERE provider = :provider AND external_id = :external_id FOR UPDATE',
+                [':provider' => $providerCode, ':external_id' => $result->externalId],
+            )->one();
 
             if ($payment === null) {
                 Yii::warning(

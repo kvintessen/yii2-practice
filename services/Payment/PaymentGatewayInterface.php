@@ -10,8 +10,8 @@ use yii\web\Request;
 
 interface PaymentGatewayInterface
 {
-    /** Stable machine key stored in payment.provider, e.g. 'yookassa'. */
-    public function getCode(): string;
+    /** Stable machine identity stored (as its ->value) in payment.provider. */
+    public function getCode(): PaymentProvider;
 
     /** Human-readable label for the checkout picker. */
     public function getLabel(): string;

@@ -62,6 +62,7 @@ class Payment extends ActiveRecord
             [['order_id'], 'integer'],
             [['provider'], 'string', 'max' => 32],
             [['external_id'], 'string', 'max' => 64],
+            [['external_id'], 'unique', 'targetAttribute' => ['provider', 'external_id']],
             [['status'], 'default', 'value' => self::STATUS_PENDING],
             [['status'], 'in', 'range' => [
                 self::STATUS_PENDING,
@@ -80,5 +81,15 @@ class Payment extends ActiveRecord
     public function getOrder(): ActiveQuery
     {
         return $this->hasOne(Order::class, ['id' => 'order_id']);
+    }
+
+    /**
+     * Normalized to exactly 2 decimals with a '.' separator — the format
+     * every gateway's API/signature expects, regardless of how the decimal
+     * column happens to have stringified this particular value.
+     */
+    public function getFormattedAmount(): string
+    {
+        return number_format((float) $this->amount, 2, '.', '');
     }
 }

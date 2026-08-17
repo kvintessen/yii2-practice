@@ -18,19 +18,20 @@ $this->params['breadcrumbs'][] = 'Pay';
 
     <?= Html::beginForm(['/payment/create', 'orderId' => $order->id], 'post', ['id' => 'payment-pay-form']) ?>
     <?php foreach ($gateways as $index => $gateway): ?>
+        <?php $code = $gateway->getCode()->value; ?>
         <div class="form-check">
             <?= Html::radio(
                 'provider',
                 $index === 0,
                 [
-                    'id' => 'provider-' . $gateway->getCode(),
-                    'value' => $gateway->getCode(),
+                    'id' => 'provider-' . $code,
+                    'value' => $code,
                     'class' => 'form-check-input',
                 ],
             ) ?>
             <?= Html::label(
                 Html::encode($gateway->getLabel()),
-                'provider-' . $gateway->getCode(),
+                'provider-' . $code,
                 ['class' => 'form-check-label'],
             ) ?>
         </div>

@@ -24,27 +24,7 @@ $config = [
                 'useFileTransport' => true,
                 'viewPath' => '@app/mail',
             ],
-            // 'fake' is registered alongside the real gateway(s) so the
-            // checkout picker and the callback flow are exercisable without
-            // real provider credentials — see services/Payment/FakeGateway.php.
-            \app\services\Payment\PaymentGatewayRegistry::class => static function () use ($params) {
-                return new \app\services\Payment\PaymentGatewayRegistry([
-                    Yii::createObject([
-                        'class' => \app\services\Payment\YooKassaGateway::class,
-                        '__construct()' => [$params['yookassaShopId'], $params['yookassaSecretKey']],
-                    ]),
-                    Yii::createObject([
-                        'class' => \app\services\Payment\RobokassaGateway::class,
-                        '__construct()' => [
-                            $params['robokassaMerchantLogin'],
-                            $params['robokassaPassword1'],
-                            $params['robokassaPassword2'],
-                            $params['robokassaTestMode'],
-                        ],
-                    ]),
-                    Yii::createObject(\app\services\Payment\FakeGateway::class),
-                ]);
-            },
+            \app\services\Payment\PaymentGatewayRegistry::class => require __DIR__ . '/payment-gateways.php',
         ],
     ],
     'aliases' => [

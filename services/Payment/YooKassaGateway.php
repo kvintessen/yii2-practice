@@ -35,9 +35,9 @@ final class YooKassaGateway implements PaymentGatewayInterface
     ) {
     }
 
-    public function getCode(): string
+    public function getCode(): PaymentProvider
     {
-        return 'yookassa';
+        return PaymentProvider::YooKassa;
     }
 
     public function getLabel(): string
@@ -49,13 +49,13 @@ final class YooKassaGateway implements PaymentGatewayInterface
     {
         $response = $this->request('POST', '/payments', [
             'amount' => [
-                'value' => number_format((float) $payment->amount, 2, '.', ''),
+                'value' => $payment->getFormattedAmount(),
                 'currency' => $payment->currency,
             ],
             'confirmation' => [
                 'type' => 'redirect',
                 'return_url' => Url::to(
-                    ['/payment/return', 'provider' => $this->getCode(), 'orderId' => $order->id],
+                    ['/payment/return', 'provider' => $this->getCode()->value, 'orderId' => $order->id],
                     true,
                 ),
             ],
@@ -144,7 +144,11 @@ final class YooKassaGateway implements PaymentGatewayInterface
         }
 
         if (!$response->isOk) {
-            throw new PaymentGatewayException(sprintf('YooKassa API returned HTTP %s.', $response->statusCode));
+            throw new PaymentGatewayException(sprintf(
+                'YooKassa API returned HTTP %s: %s',
+                $response->statusCode,
+                $response->content,
+            ));
         }
 
         return Json::decode($response->content);

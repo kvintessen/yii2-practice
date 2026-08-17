@@ -18,6 +18,7 @@ use yii\db\ActiveRecord;
  *
  * @property-read OrderItem[] $items
  * @property-read User $user
+ * @property-read Payment[] $payments
  */
 class Order extends ActiveRecord
 {
@@ -71,5 +72,10 @@ class Order extends ActiveRecord
     public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    public function getPayments(): ActiveQuery
+    {
+        return $this->hasMany(Payment::class, ['order_id' => 'id']);
     }
 }

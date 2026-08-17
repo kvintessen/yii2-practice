@@ -8,12 +8,11 @@ use app\models\Order;
 use app\models\Payment;
 use app\services\Payment\InitiatePaymentCommand;
 use app\services\Payment\InitiatePaymentHandler;
-use app\services\Payment\InvalidWebhookException;
 use app\services\Payment\PaymentCallbackHandler;
+use app\services\Payment\PaymentExceptionInterface;
 use app\services\Payment\PaymentGatewayException;
 use app\services\Payment\PaymentGatewayRegistry;
 use DomainException;
-use OutOfBoundsException;
 use Throwable;
 use Yii;
 use yii\filters\AccessControl;
@@ -98,7 +97,23 @@ class PaymentController extends Controller
                 $orderId,
                 $providerCode,
             ));
-        } catch (DomainException | OutOfBoundsException | PaymentGatewayException $e) {
+        } catch (PaymentGatewayException $e) {
+            // This one carries raw provider/API failure details — log it
+            // for ops, don't put it in front of the buyer.
+            Yii::error(
+                sprintf('Failed to initiate %s payment for order %d: %s', $providerCode, $orderId, $e),
+                __METHOD__,
+            );
+            Yii::$app->session->setFlash(
+                'error',
+                'Payment could not be started. Please try again or choose a different method.',
+            );
+
+            return $this->redirect(['pay', 'orderId' => $orderId]);
+        } catch (DomainException | PaymentExceptionInterface $e) {
+            // Everything else here is our own message, already written to
+            // be shown to the buyer (e.g. "This order is not awaiting
+            // payment.", "Unknown payment provider...").
             Yii::$app->session->setFlash('error', $e->getMessage());
 
             return $this->redirect(['pay', 'orderId' => $orderId]);
@@ -112,7 +127,7 @@ class PaymentController extends Controller
         try {
             $result = $this->callbackHandler->handle($provider, Yii::$app->request);
             $ack = $this->registry->get($provider)->getCallbackAcknowledgement($result);
-        } catch (InvalidWebhookException | PaymentGatewayException | OutOfBoundsException $e) {
+        } catch (PaymentExceptionInterface $e) {
             Yii::warning(sprintf('Rejected %s callback: %s', $provider, $e->getMessage()), __METHOD__);
 
             return $this->asPlainText('rejected', 400);
@@ -139,6 +154,11 @@ class PaymentController extends Controller
         ]);
     }
 
+    // Deliberately not shared with OrderController::actionView(), which
+    // throws 404 then 403 as two distinct steps (and so confirms whether an
+    // order id exists at all, even one that isn't yours). Payment routes
+    // collapse both cases into the same 404 on purpose — a payment URL
+    // shouldn't be usable to probe which order ids exist.
     private function findOwnedOrder(int $orderId): Order
     {
         $order = Order::findOne($orderId);

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace app\services\Payment;
 
-use OutOfBoundsException;
-
 final class PaymentGatewayRegistry
 {
     /** @var array<string, PaymentGatewayInterface> */
@@ -18,7 +16,7 @@ final class PaymentGatewayRegistry
     {
         $byCode = [];
         foreach ($gateways as $gateway) {
-            $byCode[$gateway->getCode()] = $gateway;
+            $byCode[$gateway->getCode()->value] = $gateway;
         }
 
         $this->_gatewaysByCode = $byCode;
@@ -27,7 +25,7 @@ final class PaymentGatewayRegistry
     public function get(string $code): PaymentGatewayInterface
     {
         return $this->_gatewaysByCode[$code]
-            ?? throw new OutOfBoundsException(sprintf('Unknown payment provider "%s".', $code));
+            ?? throw new UnknownPaymentGatewayException(sprintf('Unknown payment provider "%s".', $code));
     }
 
     /**

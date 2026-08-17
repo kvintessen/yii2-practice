@@ -21,9 +21,9 @@ use yii\web\Request;
  */
 final class FakeGateway implements PaymentGatewayInterface
 {
-    public function getCode(): string
+    public function getCode(): PaymentProvider
     {
-        return 'fake';
+        return PaymentProvider::Fake;
     }
 
     public function getLabel(): string
@@ -37,7 +37,10 @@ final class FakeGateway implements PaymentGatewayInterface
 
         return new PaymentInitResult(
             externalId: $externalId,
-            confirmationUrl: Url::to(['/payment/return', 'provider' => $this->getCode(), 'orderId' => $order->id], true),
+            confirmationUrl: Url::to(
+                ['/payment/return', 'provider' => $this->getCode()->value, 'orderId' => $order->id],
+                true,
+            ),
             rawPayload: json_encode(['id' => $externalId, 'order_id' => $order->id], JSON_THROW_ON_ERROR),
         );
     }

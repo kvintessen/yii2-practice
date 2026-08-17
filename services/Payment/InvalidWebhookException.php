@@ -6,6 +6,6 @@ namespace app\services\Payment;
 
 use DomainException;
 
-final class InvalidWebhookException extends DomainException
+final class InvalidWebhookException extends DomainException implements PaymentExceptionInterface
 {
 }

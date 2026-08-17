@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace app\services\Payment;
 
-final class InitiatePaymentCommand
+final readonly class InitiatePaymentCommand
 {
     public function __construct(
-        public readonly int $userId,
-        public readonly int $orderId,
-        public readonly string $providerCode,
+        public int $userId,
+        public int $orderId,
+        public string $providerCode,
     ) {
     }
 }
