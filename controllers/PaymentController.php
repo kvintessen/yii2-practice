@@ -110,7 +110,8 @@ class PaymentController extends Controller
     public function actionCallback(string $provider): Response
     {
         try {
-            $this->callbackHandler->handle($provider, Yii::$app->request);
+            $result = $this->callbackHandler->handle($provider, Yii::$app->request);
+            $ack = $this->registry->get($provider)->getCallbackAcknowledgement($result);
         } catch (InvalidWebhookException | PaymentGatewayException | OutOfBoundsException $e) {
             Yii::warning(sprintf('Rejected %s callback: %s', $provider, $e->getMessage()), __METHOD__);
 
@@ -121,7 +122,7 @@ class PaymentController extends Controller
             return $this->asPlainText('error', 500);
         }
 
-        return $this->asPlainText('ok');
+        return $this->asPlainText($ack);
     }
 
     public function actionReturn(string $provider, int $orderId): string

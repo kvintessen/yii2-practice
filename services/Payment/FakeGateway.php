@@ -63,4 +63,9 @@ final class FakeGateway implements PaymentGatewayInterface
             rawPayload: json_encode($request->post(), JSON_THROW_ON_ERROR),
         );
     }
+
+    public function getCallbackAcknowledgement(PaymentCallbackResult $result): string
+    {
+        return 'ok';
+    }
 }

@@ -24,7 +24,7 @@ final class PaymentCallbackHandler
     ) {
     }
 
-    public function handle(string $providerCode, Request $request): void
+    public function handle(string $providerCode, Request $request): PaymentCallbackResult
     {
         $gateway = $this->registry->get($providerCode);
 
@@ -47,14 +47,20 @@ final class PaymentCallbackHandler
                 );
                 $transaction->commit();
 
-                return;
+                // The signature/verification still checked out, so the
+                // caller must still acknowledge it the way this provider
+                // expects — otherwise it'll retry forever for a payment
+                // we'll never recognize.
+                return $result;
             }
 
             if (in_array($payment->status, self::TERMINAL_STATUSES, true)) {
-                // Already settled — redelivered callbacks are a no-op.
+                // Already settled — redelivered callbacks are a no-op, but
+                // still get acknowledged (see the unknown-payment branch
+                // above for why).
                 $transaction->commit();
 
-                return;
+                return $result;
             }
 
             $payment->status = match ($result->status) {
@@ -80,6 +86,8 @@ final class PaymentCallbackHandler
             }
 
             $transaction->commit();
+
+            return $result;
         } catch (Throwable $e) {
             $transaction->rollBack();
 

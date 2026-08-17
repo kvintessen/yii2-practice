@@ -113,6 +113,11 @@ final class YooKassaGateway implements PaymentGatewayInterface
         );
     }
 
+    public function getCallbackAcknowledgement(PaymentCallbackResult $result): string
+    {
+        return 'ok';
+    }
+
     /**
      * @param array<string, mixed> $body
      * @return array<string, mixed>

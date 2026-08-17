@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace app\tests\Functional;
 
 use app\models\Order;
+use app\models\Payment;
 use app\tests\Support\Fixtures\UserFixture;
 use app\tests\Support\FunctionalTester;
+use Yii;
 use yii\helpers\Url;
 
 final class PaymentCest
@@ -80,5 +82,68 @@ final class PaymentCest
             ['external_id' => 'does-not-exist', 'outcome' => 'succeeded'],
         );
         $I->seeResponseCodeIs(200);
+    }
+
+    public function robokassaAppearsAsAPaymentOption(FunctionalTester $I)
+    {
+        $order = $this->makeOrderForUser(100, '30.00');
+
+        $I->amLoggedInAs(100);
+        $I->amOnRoute('payment/pay', ['orderId' => $order->id]);
+        $I->see('Bank card (Robokassa)');
+    }
+
+    public function robokassaCallbackWithAValidSignatureMarksTheOrderPaid(FunctionalTester $I)
+    {
+        $order = $this->makeOrderForUser(100, '30.00');
+
+        $I->amLoggedInAs(100);
+        $I->amOnRoute('payment/pay', ['orderId' => $order->id]);
+        $I->submitForm('#payment-pay-form', ['provider' => 'robokassa']);
+
+        $payment = Payment::find()->where(['order_id' => $order->id, 'provider' => 'robokassa'])->one();
+        $I->assertNotNull($payment);
+
+        // Same formula RobokassaGateway::handleCallback() checks against —
+        // signed here with whatever Password #2 the test app was actually
+        // configured with, so this doesn't depend on real env values.
+        $password2 = Yii::$app->params['robokassaPassword2'];
+        $signature = md5(sprintf('%s:%s:%s', $payment->amount, $payment->external_id, $password2));
+
+        $I->sendAjaxPostRequest(Url::to(['/payment/callback', 'provider' => 'robokassa']), [
+            'OutSum' => $payment->amount,
+            'InvId' => $payment->external_id,
+            'SignatureValue' => $signature,
+        ]);
+
+        $I->seeResponseCodeIs(200);
+        // Robokassa keeps retrying until it sees exactly this — not a
+        // generic "ok".
+        $I->assertEquals('OK' . $payment->external_id, $I->grabPageSource());
+
+        $order->refresh();
+        $I->assertEquals(Order::STATUS_PAID, $order->status);
+    }
+
+    public function robokassaCallbackWithABadSignatureIsRejected(FunctionalTester $I)
+    {
+        $order = $this->makeOrderForUser(100, '30.00');
+
+        $I->amLoggedInAs(100);
+        $I->amOnRoute('payment/pay', ['orderId' => $order->id]);
+        $I->submitForm('#payment-pay-form', ['provider' => 'robokassa']);
+
+        $payment = Payment::find()->where(['order_id' => $order->id, 'provider' => 'robokassa'])->one();
+
+        $I->sendAjaxPostRequest(Url::to(['/payment/callback', 'provider' => 'robokassa']), [
+            'OutSum' => $payment->amount,
+            'InvId' => $payment->external_id,
+            'SignatureValue' => 'not-a-real-signature',
+        ]);
+
+        $I->seeResponseCodeIs(400);
+
+        $order->refresh();
+        $I->assertEquals(Order::STATUS_NEW, $order->status);
     }
 }

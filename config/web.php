@@ -33,6 +33,15 @@ $config = [
                         'class' => \app\services\Payment\YooKassaGateway::class,
                         '__construct()' => [$params['yookassaShopId'], $params['yookassaSecretKey']],
                     ]),
+                    Yii::createObject([
+                        'class' => \app\services\Payment\RobokassaGateway::class,
+                        '__construct()' => [
+                            $params['robokassaMerchantLogin'],
+                            $params['robokassaPassword1'],
+                            $params['robokassaPassword2'],
+                            $params['robokassaTestMode'],
+                        ],
+                    ]),
                     Yii::createObject(\app\services\Payment\FakeGateway::class),
                 ]);
             },

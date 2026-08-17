@@ -30,4 +30,11 @@ interface PaymentGatewayInterface
      *     follow-up status lookup).
      */
     public function handleCallback(Request $request): PaymentCallbackResult;
+
+    /**
+     * The exact response body the provider expects after a callback it
+     * trusts — some providers (Robokassa) parse this to decide whether to
+     * stop retrying, so it can't be a generic "ok" for every gateway.
+     */
+    public function getCallbackAcknowledgement(PaymentCallbackResult $result): string;
 }
