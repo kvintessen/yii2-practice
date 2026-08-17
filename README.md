@@ -4,139 +4,122 @@
         <source media="(prefers-color-scheme: light)" srcset="https://www.yiiframework.com/image/design/logo/yii3_full_for_light.svg">
         <img src="https://www.yiiframework.com/image/design/logo/yii3_full_for_light.svg" alt="Yii Framework" height="100">
     </picture>
-    <h1 align="center">Yii 2 Basic Project Template</h1>
+    <h1 align="center">Yii 2 Basic — интернет-магазин</h1>
     <br>
 </p>
 
-Yii 2 Basic Project Template is a skeleton [Yii 2](https://www.yiiframework.com/) application best for
-rapidly creating small projects.
+Проект на базе шаблона [Yii 2 Basic](https://www.yiiframework.com/), PHP >=8.2, Yii2 ~2.0.54.
 
-The template contains the basic features including user registration and login/logout.
-It includes all commonly used configurations that would allow you to focus on adding new
-features to your application.
+Вместо демонстрационной in-memory авторизации из стокового шаблона здесь реализована полноценная
+аутентификация на базе БД (`models/User.php`, `models/LoginForm.php`, `models/SignupForm.php`),
+отдельная от неё **админ-панель со своей собственной сессией и RBAC-ролью `admin`**, а также
+демо-каталог интернет-магазина (клиенты, категории, товары, заказы).
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/yiisoft/yii2-app-basic.svg?style=for-the-badge&label=Stable&logo=packagist)](https://packagist.org/packages/yiisoft/yii2-app-basic)
-[![Total Downloads](https://img.shields.io/packagist/dt/yiisoft/yii2-app-basic.svg?style=for-the-badge&label=Downloads)](https://packagist.org/packages/yiisoft/yii2-app-basic)
-[![build](https://img.shields.io/github/actions/workflow/status/yiisoft/yii2-app-basic/build.yml?style=for-the-badge&logo=github&label=Build)](https://github.com/yiisoft/yii2-app-basic/actions?query=workflow%3Abuild)
-[![codecov](https://img.shields.io/codecov/c/github/yiisoft/yii2-app-basic.svg?style=for-the-badge&logo=codecov&logoColor=white&label=Codecov)](https://codecov.io/gh/yiisoft/yii2-app-basic)
-[![Static Analysis](https://img.shields.io/github/actions/workflow/status/yiisoft/yii2-app-basic/static.yml?style=for-the-badge&label=Static)](https://github.com/yiisoft/yii2-app-basic/actions/workflows/static.yml)
+## Содержание
 
-<picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/images/home-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="docs/images/home-light.png">
-    <img src="docs/images/home-light.png" alt="Web Application Basic">
-</picture>
+- [Быстрый старт (Docker)](#быстрый-старт-docker)
+- [Makefile: список команд](#makefile-список-команд)
+- [Структура проекта](#структура-проекта)
+- [Конфигурация](#конфигурация)
+- [Аутентификация: storefront и admin](#аутентификация-storefront-и-admin)
+- [Тестирование](#тестирование)
+- [Статический анализ и code style](#статический-анализ-и-code-style)
+- [Установка без Docker](#установка-без-docker)
 
-DIRECTORY STRUCTURE
--------------------
+## Быстрый старт (Docker)
 
-      assets/             contains assets definition
-      commands/           contains console commands (controllers)
-      config/             contains application configurations
-      controllers/        contains Web controller classes
-      mail/               contains view files for e-mails
-      models/             contains model classes
-      runtime/            contains files generated during runtime
-      tests/              contains various tests for the basic application
-      vendor/             contains dependent 3rd-party packages
-      views/              contains view files for the Web application
-      web/                contains the entry script and Web resources
+Стек: `nginx` + `php-fpm` (PHP 8.4 в контейнере, `composer.json` требует >=8.2) + `postgres`,
+описан в `docker-compose.yml` и `.env`.
 
-REQUIREMENTS
-------------
+Полное развёртывание проекта одной командой:
 
-The minimum requirement by this project template that your Web server supports PHP 8.2.
-
-INSTALLATION
-------------
-
-> [!IMPORTANT]
-> - The minimum required [PHP](https://www.php.net/) version of Yii is PHP `8.2`.
-
-## Install via Composer
-
-If you do not have [Composer](https://getcomposer.org/), you may install it by following the instructions
-at [getcomposer.org](https://getcomposer.org/doc/00-intro.md#installation-nix).
-
-You can then install this project template using the following command:
-
-~~~
-composer create-project --prefer-dist yiisoft/yii2-app-basic basic
-~~~
-
-Now you should be able to access the application through the following URL, assuming `basic` is the directory
-directly under the Web root.
-
-~~~
-http://localhost/basic/web/
-~~~
-
-## Install from an Archive File
-
-Extract the archive file downloaded from [yiiframework.com](https://www.yiiframework.com/download/) to
-a directory named `basic` that is directly under the Web root.
-
-Set cookie validation key in `config/web.php` file to some random secret string:
-
-```php
-'request' => [
-    // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-    'cookieValidationKey' => '<secret random string goes here>',
-],
+```bash
+make setup
 ```
 
-You can then access the application through the following URL:
+Она делает всё по порядку: копирует `.env.example` → `.env`, собирает образы, ставит зависимости
+composer, поднимает контейнеры, применяет миграции, засевает демо-данные и собирает
+Codeception-акторов. После неё приложение доступно на **http://127.0.0.1:8080**
+(порт берётся из `NGINX_PORT` в `.env`).
 
-~~~
-http://localhost/basic/web/
-~~~
+Готовые тестовые аккаунты после `make setup` (создаются командой `seed`):
 
-## Install with Docker
+| Логин | Пароль     | Доступ                          |
+|-------|------------|----------------------------------|
+| admin | admin      | storefront + `/admin` (роль admin) |
+| demo  | demo       | storefront                       |
+| alice, bob, carol, dave, erin | password | storefront (клиенты магазина) |
 
-The dev stack is `nginx` + `php-fpm` + `postgres`, configured via `docker-compose.yml` and `.env`.
+Если нужно повторить развёртывание с нуля (включая сброс БД):
 
-Build the images
+```bash
+make clean   # остановить стек и удалить volume с данными Postgres
+make setup
+```
 
-    docker compose build
+## Makefile: список команд
 
-Install vendor packages (creates `vendor/` and generates the cookie validation key)
+```bash
+make help
+```
 
-    docker compose run --rm php composer install
+выведет актуальный список целей. Основные:
 
-Start the stack
+| Команда | Что делает |
+|---|---|
+| `make setup` | Полное развёртывание: env → build → install → up → migrate → seed → codecept-build |
+| `make env` | Создать `.env` из `.env.example`, если его ещё нет |
+| `make build` | Собрать docker-образы (`docker compose build`) |
+| `make install` | `composer install` внутри контейнера (создаёт `vendor/`, генерирует `cookieValidationKey`) |
+| `make up` / `make down` | Поднять / остановить стек |
+| `make stop` / `make restart` | Остановить без удаления контейнеров / перезапустить |
+| `make migrate` / `make migrate-down` | Применить / откатить последнюю миграцию |
+| `make seed` | Засеять демо-данные (`php yii seed/all`) |
+| `make codecept-build` | Пересобрать `Support/_generated` акторы Codeception |
+| `make test` | Прогнать все тесты (Unit + Functional + Acceptance) |
+| `make test-unit` / `make test-functional` / `make test-acceptance` | Прогнать конкретный набор тестов |
+| `make static` | phpstan (level 5) |
+| `make cs` / `make cs-fix` | phpcs / автофикс phpcbf |
+| `make logs` / `make ps` / `make sh` | Логи стека / статус контейнеров / shell в контейнере php |
+| `make clean` | `docker compose down -v` — полный сброс, включая данные Postgres |
 
-    docker compose up -d
+## Структура проекта
 
-Create the database schema (migrations)
+      assets/             ассеты (JS/CSS)
+      commands/            консольные команды (в т.ч. seed/all)
+      config/              конфигурация приложения
+      controllers/         контроллеры storefront
+      docker/               Dockerfile (multi-stage) и конфиг nginx
+      mail/                вью для писем
+      migrations/          миграции БД
+      models/              модели (в т.ч. User, LoginForm, SignupForm)
+      modules/admin/       модуль админ-панели (отдельная авторизация)
+      services/            сервисный слой (например AdminLoginService)
+      tests/               тесты Codeception (Unit, Functional, Acceptance)
+      vendor/              зависимости composer
+      views/               вью storefront и админки
+      web/                 точка входа и веб-ресурсы
 
-    docker compose exec php php yii migrate
+## Конфигурация
 
-You can then access the application through the following URL:
+`config/db.php` и `config/test_db.php` читают подключение из переменных `.env`:
+`POSTGRES_HOST` / `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD`. Порт Postgres **внутри**
+DSN зашит как `5432` (внутренний порт контейнера) независимо от `POSTGRES_PORT` — эта переменная
+влияет только на проброс порта на хост.
 
-    http://127.0.0.1:8080
+Тестовая БД — `{POSTGRES_DB}_test` (см. `config/test_db.php`), отдельная от dev-базы.
 
-(the port comes from `NGINX_PORT` in `.env`)
+**Заметки:**
+- Данные Postgres хранятся в volume `db-data`; `make clean` (`docker compose down -v`) их сбрасывает.
+- Xdebug вшит в стадию `dev` образа, но по умолчанию выключен. Включить на один запуск:
+  `XDEBUG_MODE=debug docker compose up -d`, либо выставить `XDEBUG_MODE=debug` в `.env`.
+- `docker/php/Dockerfile` содержит 4 стадии: `base` (только PHP + расширения), `dev`
+  (bind-mount воркфлоу выше, Xdebug), `build` (`composer install --no-dev`, приложение
+  запекается в образ — не используется docker-compose.yml) и `prod` (только результат `build`,
+  без composer и компиляторов, запускается от `www-data`). Продовый образ собирается так:
+  `docker build -f docker/php/Dockerfile --target prod -t <tag> .`.
 
-Run tests inside the container
-
-    docker compose exec php vendor/bin/codecept build
-    docker compose exec php vendor/bin/codecept run
-
-**NOTES:**
-- The default configuration uses a host-volume in your home directory `~/.composer-docker/cache` for Composer caches.
-- Postgres data persists in the named volume `db-data`; remove it with `docker compose down -v` to reset the database.
-- Xdebug is bundled but disabled by default. Enable it per-run with `XDEBUG_MODE=debug docker compose up -d`, or set `XDEBUG_MODE=debug` in `.env`.
-
-
-CONFIGURATION
--------------
-
-## Database
-
-When running via Docker, `config/db.php` and `config/test_db.php` read the connection from
-`POSTGRES_HOST` / `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` in `.env` — no manual editing needed.
-
-Running without Docker (e.g. against a local Postgres/MySQL install)? Edit `config/db.php` directly, for example:
+Запуск без Docker (локальный PHP/Postgres) — правьте `config/db.php` напрямую:
 
 ```php
 return [
@@ -148,95 +131,108 @@ return [
 ];
 ```
 
-**NOTES:**
-- The Docker Postgres container creates the database from `POSTGRES_DB` automatically; outside Docker you still need to create it manually before you can access it.
-- Check and edit the other files in the `config/` directory to customize your application as required.
-- Refer to the README in the `tests` directory for information specific to basic application tests.
+## Аутентификация: storefront и admin
 
-TESTING
--------
+- **Storefront**: `SiteController::actionLogin/actionSignup/actionLogout` — единственные точки
+  входа для обычных пользователей. `LoginForm` ищет пользователя через `User::findByUsername()`
+  и проверяет пароль через `security->validatePassword()`; `SignupForm::signup()` хеширует пароль
+  через `security->generatePasswordHash()`.
+- **Admin — полностью отдельная сессия** от storefront, хотя модель/таблица `User` та же.
+  `config/web.php` регистрирует второй компонент `adminUser` (`yii\web\User`) со своими
+  `idParam`/`authTimeoutParam`/`identityCookie`, чтобы не пересекаться с сессией обычного `user`.
+  `modules/admin/controllers/SiteController` аутентифицирует через `Yii::$app->adminUser` с
+  помощью `services/AdminLoginService`, который дополнительно проверяет наличие RBAC-роли
+  `admin` (`authManager->checkAccess`) — обычный логин никогда не даёт доступ в админку, и
+  наоборот, даже для аккаунта с этой ролью.
+- Миграции создают только схему, включая саму RBAC-роль `admin` как *item*, но **не** назначают
+  её ни одному пользователю — это уже данные. Назначение роли и создание аккаунтов `admin`/`admin`
+  и `demo`/`demo` делает `php yii seed/all` (`make seed`), идемпотентно.
+- Для тестов вместо seed используются фикстуры `tests/Support/Fixtures/UserFixture.php` (+
+  `AdminRoleAssignmentFixture.php`) с фиксированными id `100`/`101`.
 
-Tests are located in `tests` directory. They are developed with [Codeception PHP Testing Framework](https://codeception.com/).
-By default, there are 3 test suites:
+## Тестирование
 
-- `unit`
-- `functional`
-- `acceptance`
+Тесты лежат в `tests/`, три набора: `Unit`, `Functional`, `Acceptance` (Codeception).
 
-Tests can be executed by running
-
-```
-vendor/bin/codecept run --env php-builtin
-```
-
-The command above will execute unit and functional tests. Unit tests are testing the system components, while functional
-tests are for testing user interaction.
-
-
-## Acceptance tests
-
-The `acceptance` suite is configured in `tests/Acceptance.suite.yml`.
-
-### Acceptance tests (PhpBrowser)
-
-By default, acceptance tests use the `PhpBrowser` module and run against the built-in PHP web server started via the
-`php-builtin` environment.
-
-```
-# run all tests with built-in web server
-composer tests
-
-# run acceptance tests only
-vendor/bin/codecept run Acceptance --env php-builtin
+```bash
+make test                  # все наборы
+make test-unit              # только Unit
+make test-functional        # только Functional
+make test-acceptance        # только Acceptance
 ```
 
-### Acceptance tests (WebDriver + Selenium)
+Прогон конкретного файла/теста:
 
-To run acceptance tests in a real browser, switch the `acceptance` suite to use the `WebDriver` module.
-`tests/Acceptance.suite.yml` contains an example WebDriver configuration (commented).
-
-1. Download and start [Selenium Server](https://www.selenium.dev/downloads/).
-2. Install the corresponding browser driver (for example. [GeckoDriver](https://github.com/mozilla/geckodriver/releases) or
-   [ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/)).
-3. Update `tests/Acceptance.suite.yml` to enable `WebDriver` and disable `PhpBrowser`.
-4. Run:
-
-```
-vendor/bin/codecept run Acceptance --env php-builtin
+```bash
+docker compose exec php vendor/bin/codecept run tests/Unit/Models/LoginFormTest.php --env php-builtin
+docker compose exec php vendor/bin/codecept run tests/Unit/Models/LoginFormTest.php:testCorrectLogin --env php-builtin
 ```
 
-## Code coverage support
+После изменения акторов/модулей Codeception пересоберите классы:
 
-Code coverage is configured in `codeception.yml`. You can run your tests and collect coverage with the following command:
-
-```
-#collect coverage for all tests
-vendor/bin/codecept run --coverage --coverage-html --coverage-xml --env php-builtin
-
-#collect coverage only for unit tests
-vendor/bin/codecept run Unit --coverage --coverage-html --coverage-xml --env php-builtin
-
-#collect coverage for unit and functional tests
-vendor/bin/codecept run Functional,Unit --coverage --coverage-html --coverage-xml --env php-builtin
+```bash
+make codecept-build
 ```
 
-You can see code coverage output under the `tests/Support/output` directory.
+**Acceptance-тесты** по умолчанию используют `PhpBrowser` против встроенного PHP-сервера
+(`--env php-builtin`). Чтобы гонять их в реальном браузере через WebDriver + Selenium, включите
+соответствующую (закомментированную) конфигурацию в `tests/Acceptance.suite.yml`.
 
-## Documentation
+`tests/Acceptance.suite.yml` использует `transaction: false`: тестируемое приложение работает в
+отдельном PHP-процессе (встроенный сервер) и видит только закоммиченные данные — поэтому любые
+ORM/fixture-записи из тестового процесса не должны оборачиваться в откатываемую транзакцию.
 
-- [Internals](docs/internals.md)
+### Покрытие кода
 
-## Support the project
+```bash
+docker compose exec php vendor/bin/codecept run --coverage --coverage-html --coverage-xml --env php-builtin
+```
 
-[![Open Collective](https://img.shields.io/badge/Open%20Collective-sponsor-7eadf1?style=for-the-badge&logo=open%20collective&logoColor=7eadf1&labelColor=555555)](https://opencollective.com/yiisoft)
+Результат — в `tests/Support/output`.
 
-## Follow updates
+## Статический анализ и code style
 
-[![Official website](https://img.shields.io/badge/Powered_by-Yii_Framework-green.svg?style=for-the-badge&logo=yii)](https://www.yiiframework.com/)
-[![Follow on X](https://img.shields.io/badge/-Follow%20on%20X-1DA1F2.svg?style=for-the-badge&logo=x&logoColor=white&labelColor=000000)](https://x.com/yiiframework)
-[![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=for-the-badge&logo=telegram)](https://t.me/yii_framework_in_english)
-[![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=for-the-badge&logo=slack)](https://yiiframework.com/go/slack)
+```bash
+make static   # phpstan, level 5
+make cs       # phpcs (Yii2 coding standard)
+make cs-fix   # phpcbf автофикс
+```
 
-## License
+Оба инструмента ограничены каталогами `assets, commands, controllers, mail, models, widgets` и
+`tests/*` (см. `phpstan.neon` / `phpcs.xml.dist`) — `config/`, `views/`, `web/` не проверяются.
+
+## Установка без Docker
+
+Через Composer:
+
+```bash
+composer create-project --prefer-dist yiisoft/yii2-app-basic basic
+```
+
+либо в существующем проекте:
+
+```bash
+composer install
+```
+
+Задайте `cookieValidationKey` в `config/web.php`:
+
+```php
+'request' => [
+    'cookieValidationKey' => '<секретная случайная строка>',
+],
+```
+
+Создайте БД (Postgres или совместимую, вручную — Docker-контейнер делает это автоматически по
+`POSTGRES_DB`) и настройте `config/db.php`, затем примените миграции и, при желании, seed:
+
+```bash
+php yii migrate
+php yii seed/all
+```
+
+Приложение будет доступно по адресу вида `http://localhost/basic/web/`.
+
+## Лицензия
 
 [![License](https://img.shields.io/badge/License-BSD--3--Clause-brightgreen.svg?style=for-the-badge&logo=opensourceinitiative&logoColor=white&labelColor=555555)](LICENSE.md)
