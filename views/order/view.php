@@ -5,6 +5,7 @@ declare(strict_types=1);
 /** @var yii\web\View $this */
 /** @var app\models\Order $order */
 
+use app\models\Order;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -13,6 +14,10 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="order-view">
     <h1><?= Html::encode($this->title) ?></h1>
+
+    <?php if ($order->status === Order::STATUS_NEW): ?>
+        <?= Html::a('Pay now', ['/payment/pay', 'orderId' => $order->id], ['class' => 'btn btn-primary mb-3']) ?>
+    <?php endif; ?>
 
     <?= DetailView::widget([
         'model' => $order,

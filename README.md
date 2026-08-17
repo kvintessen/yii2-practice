@@ -22,6 +22,7 @@
 - [Структура проекта](#структура-проекта)
 - [Конфигурация](#конфигурация)
 - [Аутентификация: storefront и admin](#аутентификация-storefront-и-admin)
+- [Оплата](#оплата)
 - [Тестирование](#тестирование)
 - [Статический анализ и code style](#статический-анализ-и-code-style)
 - [Установка без Docker](#установка-без-docker)
@@ -149,6 +150,35 @@ return [
   и `demo`/`demo` делает `php yii seed/all` (`make seed`), идемпотентно.
 - Для тестов вместо seed используются фикстуры `tests/Support/Fixtures/UserFixture.php` (+
   `AdminRoleAssignmentFixture.php`) с фиксированными id `100`/`101`.
+
+## Оплата
+
+Заказ (`models/Order`) доходит до `STATUS_NEW`, дальше оплата — отдельная сущность `models/Payment`
+(на один заказ может быть несколько попыток оплаты разными способами), обрабатываемая через
+`services/Payment/`:
+
+- **`PaymentGatewayInterface`** — контракт шлюза (`createPayment`/`handleCallback`), реализации
+  резолвятся через DI-singleton `PaymentGatewayRegistry` (`config/web.php`), так что в форме на
+  `/orders/<id>/pay` покупатель выбирает из всех зарегистрированных провайдеров.
+- **`YooKassaGateway`** — реализация на [ЮKassa](https://yookassa.ru/developers/api). Тестовые
+  креды (shopId/secretKey) берутся из личного кабинета ЮKassa (тестовый магазин) и задаются через
+  `.env`: `YOOKASSA_SHOP_ID` / `YOOKASSA_SECRET_KEY`. Без них шлюз просто не будет работать — в
+  форме выбора останется только `fake`.
+  **Важно про вебхуки**: `handleCallback()` не доверяет телу входящего POST — оттуда берётся
+  только id платежа, дальше статус переспрашивается напрямую у ЮKassa (`GET /payments/{id}` с
+  теми же кредами). Источник истины — этот авторизованный запрос, а не то, что кто-то смог
+  отправить на наш `/payment/yookassa/callback`.
+- **`FakeGateway`** — шлюз без сети, второй implementer интерфейса. Проходит тот же код колбэка,
+  что и боевой провайдер, просто вызывается вручную: на странице `/payment/return` после выбора
+  `fake`-способа есть панель "Dev tools: simulate the gateway's webhook" (видна везде, кроме
+  `YII_ENV_PROD`) с кнопками, которые постят на реальный `payment/fake/callback` — удобно
+  прогнать весь путь заказа до `paid` без тестового магазина.
+- Обработка колбэка идемпотентна: повторная доставка одного и того же события — no-op
+  (`services/Payment/PaymentCallbackHandler.php` проверяет, не находится ли `Payment` уже в
+  терминальном статусе).
+- `PaymentController::actionCallback` — единственный экшен с отключённым CSRF (точечно, в
+  `beforeAction`, только для этого action id) — это server-to-server вызов провайдера, а не
+  запрос из браузера с сессией.
 
 ## Тестирование
 

@@ -24,6 +24,17 @@ return [
         'definitions' => [
             \yii\widgets\LinkPager::class => \yii\bootstrap5\LinkPager::class,
         ],
+        'singletons' => [
+            \app\services\Payment\PaymentGatewayRegistry::class => static function () use ($params) {
+                return new \app\services\Payment\PaymentGatewayRegistry([
+                    Yii::createObject([
+                        'class' => \app\services\Payment\YooKassaGateway::class,
+                        '__construct()' => [$params['yookassaShopId'], $params['yookassaSecretKey']],
+                    ]),
+                    Yii::createObject(\app\services\Payment\FakeGateway::class),
+                ]);
+            },
+        ],
     ],
     'components' => [
         'db' => $db,

@@ -24,6 +24,18 @@ $config = [
                 'useFileTransport' => true,
                 'viewPath' => '@app/mail',
             ],
+            // 'fake' is registered alongside the real gateway(s) so the
+            // checkout picker and the callback flow are exercisable without
+            // real provider credentials — see services/Payment/FakeGateway.php.
+            \app\services\Payment\PaymentGatewayRegistry::class => static function () use ($params) {
+                return new \app\services\Payment\PaymentGatewayRegistry([
+                    Yii::createObject([
+                        'class' => \app\services\Payment\YooKassaGateway::class,
+                        '__construct()' => [$params['yookassaShopId'], $params['yookassaSecretKey']],
+                    ]),
+                    Yii::createObject(\app\services\Payment\FakeGateway::class),
+                ]);
+            },
         ],
     ],
     'aliases' => [
@@ -97,6 +109,11 @@ $config = [
 
                 'orders' => 'order/index',
                 'orders/<id:\d+>' => 'order/view',
+
+                'orders/<orderId:\d+>/pay' => 'payment/pay',
+                'payment/create' => 'payment/create',
+                'payment/<provider:[\w-]+>/callback' => 'payment/callback',
+                'payment/<provider:[\w-]+>/return' => 'payment/return',
 
                 'admin' => 'admin/category/index',
                 'admin/login' => 'admin/site/login',
